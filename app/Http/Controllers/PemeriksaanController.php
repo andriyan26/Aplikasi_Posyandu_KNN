@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DataLatih;
 use App\Models\Pemeriksaan;
 use App\Models\Balita;
 use Illuminate\Http\Request;
@@ -74,13 +75,12 @@ class PemeriksaanController extends Controller
             $balita->jenis_kelamin
         );
 
-        // Model Klasifikasi (Bisa Manual, Atau KNN jika kita melatih dengan data dari DB)
-        // Disini kita gunakan data DB yang ada sebagai riwayat latih KNN, jika tidak ada, default classify Z-score
-        $trainingItems = Pemeriksaan::whereNotNull('status_stunting')->get();
+        // Sumber data training KNN beralih ke Data Latih (dari CSV import)
+        $trainingItems = DataLatih::all();
         
         $knnPrediction = 'Rendah'; // default
 
-        // Jika data latih KNN ada lebih dari 3
+        // Jika data latih KNN ada lebih dari atau sama dengan 3
         if ($trainingItems->count() >= 3) {
             $trainData = [];
             foreach ($trainingItems as $item) {
@@ -88,7 +88,7 @@ class PemeriksaanController extends Controller
                     'features' => [
                         $item->berat_badan,
                         $item->tinggi_badan,
-                        $item->z_score
+                        $item->z_score ?? 0
                     ],
                     'label' => $item->status_stunting
                 ];
@@ -100,9 +100,10 @@ class PemeriksaanController extends Controller
                 $z_score
             ];
 
+            // Default K = 3
             $knnPrediction = $this->knnService->predict($trainData, $testFeatures, 3);
         } else {
-            // Karena tidak cukup data latih, kita gunakan Z-Score standard fallback
+            // Jika tidak ada data latih, gunakan klasifikasi Z-Score referensi WHO
             $knnPrediction = $this->zScoreService->classify($z_score);
         }
 

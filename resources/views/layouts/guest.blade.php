@@ -5,7 +5,10 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+        <title>{{ config('app.name', 'Posyandu Belimbing') }}</title>
+
+        <!-- Favicon -->
+        <link rel="icon" type="image/png" href="{{ asset('assets/Logo.png') }}">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -32,7 +35,7 @@
             <div class="flex flex-col items-center mb-6 transform transition hover:scale-105 duration-300">
                 <a href="/" class="flex flex-col items-center group">
                     <div class="p-3 bg-white/10 rounded-2xl backdrop-blur-md border border-white/20 shadow-xl group-hover:bg-white/20 transition duration-300">
-                        <x-application-logo class="w-12 h-12 fill-current text-white/90 drop-shadow-lg" />
+                        <x-application-logo class="w-12 h-12 drop-shadow-2xl" />
                     </div>
                     <h1 class="mt-4 text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-teal-200 to-blue-200 tracking-wider uppercase drop-shadow-md">Posyandu Belimbing</h1>
                     <p class="mt-1 text-blue-100/80 font-medium tracking-wide text-xs">Pemantauan Gizi & Stunting Terpadu</p>

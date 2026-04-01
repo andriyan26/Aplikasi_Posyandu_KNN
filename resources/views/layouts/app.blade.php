@@ -7,6 +7,9 @@
 
         <title>{{ config('app.name', 'Posyandu Belimbing') }}</title>
 
+        <!-- Favicon -->
+        <link rel="icon" type="image/png" href="{{ asset('assets/Logo.png') }}">
+
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700,800&display=swap" rel="stylesheet" />
@@ -42,8 +45,8 @@
                             <button @click="sidebarOpen = true" class="md:hidden p-1 rounded-md text-white hover:bg-white/10 focus:outline-none">
                                 <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                             </button>
-                            <h1 class="text-xl sm:text-2xl font-semibold tracking-wide flex items-center gap-2 uppercase">
-                                <svg class="w-6 h-6 sm:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                            <h1 class="text-xl sm:text-2xl font-semibold tracking-wide flex items-center gap-3 uppercase">
+                                <img src="{{ asset('assets/Logo.png') }}" class="w-8 h-8 object-contain drop-shadow-md" alt="Logo">
                                 POSYANDU BELIMBING
                             </h1>
                         </div>

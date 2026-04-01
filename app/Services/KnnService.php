@@ -62,31 +62,91 @@ class KnnService
      */
     public function evaluateModel(array $trainData, array $testData, int $k = 3): array
     {
-        $correct = 0;
         $total = count($testData);
+        if ($total === 0) {
+            return [
+                'accuracy' => 0,
+                'precision' => 0,
+                'recall' => 0,
+                'f1_score' => 0,
+                'correct' => 0,
+                'total' => 0,
+                'confusion_matrix' => [],
+                'predictions' => []
+            ];
+        }
+
+        $correct = 0;
         $predictions = [];
+        $classes = ['Rendah', 'Sedang', 'Tinggi'];
         
-        $truePositives = 0; // for complex precision calculating
-        // In multi-class, normally we compute accuracy over all classes.
+        // Initialize Confusion Matrix
+        $matrix = [];
+        foreach ($classes as $actual) {
+            foreach ($classes as $predicted) {
+                $matrix[$actual][$predicted] = 0;
+            }
+        }
 
         foreach ($testData as $testItem) {
             $prediction = $this->predict($trainData, $testItem['features'], $k);
-            if ($prediction === $testItem['label']) {
+            $actual = $testItem['label'];
+            
+            if ($prediction === $actual) {
                 $correct++;
             }
+            
+            $matrix[$actual][$prediction]++;
+            
             $predictions[] = [
-                'actual' => $testItem['label'],
+                'actual' => $actual,
                 'predicted' => $prediction
             ];
         }
 
-        $accuracy = ($total > 0) ? ($correct / $total) * 100 : 0;
+        // Calculate Precision, Recall, F1 for each class (Macro Averaging)
+        $precisionSum = 0;
+        $recallSum = 0;
+        $f1Sum = 0;
+        $validClasses = 0;
+
+        foreach ($classes as $class) {
+            $tp = $matrix[$class][$class];
+            
+            $fp = 0;
+            foreach ($classes as $otherClass) {
+                if ($otherClass !== $class) $fp += $matrix[$otherClass][$class];
+            }
+            
+            $fn = 0;
+            foreach ($classes as $otherClass) {
+                if ($otherClass !== $class) $fn += $matrix[$class][$otherClass];
+            }
+
+            $precision = ($tp + $fp) > 0 ? $tp / ($tp + $fp) : 0;
+            $recall = ($tp + $fn) > 0 ? $tp / ($tp + $fn) : 0;
+            $f1 = ($precision + $recall) > 0 ? 2 * ($precision * $recall) / ($precision + $recall) : 0;
+
+            $precisionSum += $precision;
+            $recallSum += $recall;
+            $f1Sum += $f1;
+            $validClasses++;
+        }
+
+        $accuracy = ($correct / $total) * 100;
+        $avgPrecision = ($precisionSum / $validClasses) * 100;
+        $avgRecall = ($recallSum / $validClasses) * 100;
+        $avgF1 = ($f1Sum / $validClasses) * 100;
 
         return [
             'accuracy' => round($accuracy, 2),
+            'precision' => round($avgPrecision, 2),
+            'recall' => round($avgRecall, 2),
+            'f1_score' => round($avgF1, 2),
             'correct' => $correct,
             'total' => $total,
             'k' => $k,
+            'confusion_matrix' => $matrix,
             'predictions' => $predictions
         ];
     }

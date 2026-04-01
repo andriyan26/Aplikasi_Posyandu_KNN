@@ -27,12 +27,17 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Admin Only Actions
-    Route::middleware('role:admin')->group(function () {
+    // KNN Evaluation & Training (Admin & Kader)
+    Route::middleware('role:admin,kader')->group(function () {
         Route::get('/evaluasi-knn', [KnnController::class, 'evaluasi'])->name('knn.evaluasi');
+        Route::post('/knn/import', [KnnController::class, 'import'])->name('knn.import');
+        Route::delete('/knn/destroy-all', [KnnController::class, 'destroyAll'])->name('knn.destroy_all');
+        Route::get('/knn/template', [KnnController::class, 'downloadTemplate'])->name('knn.template');
         Route::post('/kunjungan/import', [ImportController::class, 'importCsv'])->name('kunjungan.import');
-        
-        // Manajemen User
+    });
+
+    // Admin Only Actions (User Management)
+    Route::middleware('role:admin')->group(function () {
         Route::resource('users', UserController::class)->except(['show', 'create', 'edit']);
     });
 });
