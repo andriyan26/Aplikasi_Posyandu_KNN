@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Balita extends Model
 {
+    protected $table = 'balita';
+
     protected $fillable = ['kode', 'nik', 'nama', 'usia', 'tanggal_lahir', 'jenis_kelamin', 'nama_orang_tua'];
 
     public function pemeriksaans()

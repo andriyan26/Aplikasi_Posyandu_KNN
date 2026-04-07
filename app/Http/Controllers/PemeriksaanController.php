@@ -50,7 +50,7 @@ class PemeriksaanController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'balita_id' => 'required|exists:balitas,id',
+            'balita_id' => 'required|exists:balita,id',
             'tanggal_pemeriksaan' => 'required|date',
             'berat_badan' => 'required|numeric',
             'tinggi_badan' => 'required|numeric',

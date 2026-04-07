@@ -9,6 +9,8 @@ class DataLatih extends Model
 {
     use HasFactory;
 
+    protected $table = 'data_latih';
+
     protected $fillable = [
         'nama',
         'jenis_kelamin',
