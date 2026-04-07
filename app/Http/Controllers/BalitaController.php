@@ -38,13 +38,26 @@ class BalitaController extends Controller
     public function store(Request $request)
     {
         $request->validate([
+            'nik' => 'required|string|max:20',
             'nama' => 'required|string|max:255',
             'tanggal_lahir' => 'required|date',
             'jenis_kelamin' => 'required|in:L,P',
             'nama_orang_tua' => 'required|string|max:255',
         ]);
 
-        Balita::create($request->all());
+        $data = $request->all();
+        
+        // Generate Auto Increment Kode (Format: BAL-0001)
+        $lastBalita = Balita::orderBy('id', 'desc')->first();
+        if ($lastBalita && $lastBalita->kode) {
+            $lastNumber = (int) substr($lastBalita->kode, 4);
+            $newNumber = $lastNumber + 1;
+        } else {
+            $newNumber = 1;
+        }
+        $data['kode'] = 'BAL-' . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
+
+        Balita::create($data);
 
         return redirect()->route('balita.index')->with('success', 'Data Balita berhasil ditambahkan');
     }
@@ -57,6 +70,7 @@ class BalitaController extends Controller
     public function update(Request $request, Balita $balita)
     {
         $request->validate([
+            'nik' => 'required|string|max:20',
             'nama' => 'required|string|max:255',
             'tanggal_lahir' => 'required|date',
             'jenis_kelamin' => 'required|in:L,P',

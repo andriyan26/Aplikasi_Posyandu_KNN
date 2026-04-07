@@ -4,14 +4,14 @@
     </x-slot>
 
     <!-- Peringkat Tertinggi Card (Grafik) -->
-    <div class="bg-white dark:bg-slate-800 rounded-[20px] shadow-sm border border-slate-100 dark:border-slate-700/50 overflow-hidden mb-6 relative z-20 transition-colors duration-300">
+    <div x-data="{ showGraph: true }" x-show="showGraph" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95" class="bg-white dark:bg-slate-800 rounded-[20px] shadow-sm border border-slate-100 dark:border-slate-700/50 overflow-hidden mb-6 relative z-20 transition-colors duration-300">
         <!-- Badge Info Header -->
         <div class="bg-[#e8f5e9] dark:bg-green-900/10 px-6 py-4 flex items-center justify-between border-b border-green-100 dark:border-green-800/50">
             <p class="text-green-800 dark:text-green-400 text-sm font-semibold flex items-center gap-2">
                 <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
                 Grafik Jumlah Kunjungan Posyandu 6 Bulan Terakhir
             </p>
-            <button class="text-green-600 hover:bg-green-200/50 p-1.5 rounded-full transition">
+            <button @click="showGraph = false" class="text-green-600 dark:text-green-500 hover:bg-green-200/50 dark:hover:bg-green-900/30 p-1.5 rounded-full transition" title="Tutup Grafik">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
         </div>

@@ -12,9 +12,11 @@ class DataLatih extends Model
     protected $fillable = [
         'nama',
         'jenis_kelamin',
+        'usia',
         'berat_badan',
         'tinggi_badan',
-        'z_score',
+        'lingkar_lengan_atas',
+        'lingkar_kepala',
         'status_stunting',
     ];
 }

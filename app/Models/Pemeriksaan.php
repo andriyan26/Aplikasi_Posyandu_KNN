@@ -9,12 +9,12 @@ class Pemeriksaan extends Model
 {
     protected $fillable = [
         'balita_id',
+        'usia_saat_periksa',
         'tanggal_pemeriksaan',
         'berat_badan',
         'tinggi_badan',
         'lingkar_lengan_atas',
         'lingkar_kepala',
-        'z_score',
         'status_stunting'
     ];
 

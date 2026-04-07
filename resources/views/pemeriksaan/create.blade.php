@@ -3,6 +3,9 @@
         CATAT PEMERIKSAAN BARU
     </x-slot>
 
+    <!-- Include Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
     <div class="max-w-3xl relative z-20">
         <div class="bg-white dark:bg-slate-800 rounded-[20px] shadow-sm border border-slate-100 dark:border-slate-700/50 overflow-hidden mb-10 transition-colors">
             
@@ -35,22 +38,29 @@
                         <span class="h-5 w-5 rounded-full bg-indigo-500 text-white flex items-center justify-center text-[10px] font-black">1</span>
                         Data Balita &amp; Tanggal Pemeriksaan
                     </h4>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                        <div>
-                            <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Pilih Balita</label>
-                            <select name="balita_id" required class="w-full rounded-xl text-sm border-slate-300 dark:border-slate-700 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-3.5 bg-slate-50 dark:bg-slate-900 dark:text-white transition-colors">
-                                <option value="" disabled selected>-- Pilih Nama Balita --</option>
+                    <div class="grid grid-cols-1 md:grid-cols-12 gap-5">
+                        <div class="md:col-span-6">
+                            <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Pilih Balita (Cari Kode/Nama/Ortu)</label>
+                            <select name="balita_id" id="balita_select" required class="w-full rounded-xl text-sm border-slate-300 dark:border-slate-700 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-3.5 bg-slate-50 dark:bg-slate-900 dark:text-white transition-colors">
+                                <option value="" disabled selected>-- Cari Kode, Nama, atau Orang Tua --</option>
                                 @foreach($balitas as $b)
-                                    <option value="{{ $b->id }}">{{ $b->nama }} (Ortu: {{ $b->nama_orang_tua }})</option>
+                                    <option value="{{ $b->id }}" data-tanggal-lahir="{{ $b->tanggal_lahir }}">[{{ $b->kode ?? 'Belum ada Kode' }}] {{ $b->nama }} (Ortu: {{ $b->nama_orang_tua }})</option>
                                 @endforeach
                             </select>
                             @error('balita_id') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
                         </div>
  
-                        <div>
+                        <div class="md:col-span-3">
                             <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Tanggal Pemeriksaan</label>
-                            <input type="date" name="tanggal_pemeriksaan" value="{{ date('Y-m-d') }}" required class="w-full rounded-xl text-sm border-slate-300 dark:border-slate-700 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-3.5 bg-slate-50 dark:bg-slate-900 dark:text-white transition-colors">
+                            <input type="date" name="tanggal_pemeriksaan" id="tgl_pemeriksaan" value="{{ date('Y-m-d') }}" required class="w-full rounded-xl text-sm border-slate-300 dark:border-slate-700 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-3.5 bg-slate-50 dark:bg-slate-900 dark:text-white transition-colors">
                             @error('tanggal_pemeriksaan') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div class="md:col-span-3">
+                            <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Estimasi Usia <span class="text-indigo-500">(Otomatis)</span></label>
+                            <div class="relative">
+                                <input type="text" id="usia_tampil" readonly placeholder="- Tahun" class="w-full rounded-xl text-sm border-slate-200 dark:border-slate-700 shadow-sm p-3.5 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 cursor-not-allowed font-black transition-colors focus:ring-0">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -80,17 +90,17 @@
                         <div>
                             <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">
                                 Lingkar Lengan Atas / LiLA
-                                <span class="text-xs font-normal text-slate-400 dark:text-slate-500">(cm) - Opsional</span>
+                                <span class="text-indigo-500">(cm) *</span>
                             </label>
-                            <input type="number" step="0.01" name="lingkar_lengan_atas" placeholder="Contoh: 14.5" class="w-full rounded-xl text-sm border-slate-300 dark:border-slate-700 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-3.5 bg-slate-50 dark:bg-slate-900 dark:text-white transition-colors">
+                            <input type="number" step="0.01" name="lingkar_lengan_atas" required placeholder="Contoh: 14.5" class="w-full rounded-xl text-sm border-slate-300 dark:border-slate-700 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-3.5 bg-slate-50 dark:bg-slate-900 dark:text-white transition-colors">
                         </div>
  
                         <div>
                             <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">
                                 Lingkar Kepala
-                                <span class="text-xs font-normal text-slate-400 dark:text-slate-500">(cm) - Opsional</span>
+                                <span class="text-indigo-500">(cm) *</span>
                             </label>
-                            <input type="number" step="0.01" name="lingkar_kepala" placeholder="Contoh: 46.0" class="w-full rounded-xl text-sm border-slate-300 dark:border-slate-700 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-3.5 bg-slate-50 dark:bg-slate-900 dark:text-white transition-colors">
+                            <input type="number" step="0.01" name="lingkar_kepala" required placeholder="Contoh: 46.0" class="w-full rounded-xl text-sm border-slate-300 dark:border-slate-700 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-3.5 bg-slate-50 dark:bg-slate-900 dark:text-white transition-colors">
                         </div>
                     </div>
                 </div>
@@ -98,7 +108,7 @@
                 <!-- Info Box KNN -->
                 <div class="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800/50 rounded-xl p-4 flex items-start gap-3 transition-colors">
                     <svg class="h-5 w-5 text-indigo-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    <p class="text-xs text-indigo-700 dark:text-indigo-400 font-medium">Setelah disimpan, sistem akan otomatis menghitung <strong>Z-Score</strong> dan mengklasifikasikan risiko stunting menggunakan <strong>Algoritma K-Nearest Neighbor (KNN)</strong> berdasarkan data riwayat yang ada.</p>
+                    <p class="text-xs text-indigo-700 dark:text-indigo-400 font-medium">Setelah disimpan, sistem akan otomatis mengklasifikasikan risiko stunting menggunakan <strong>Algoritma K-Nearest Neighbor (KNN)</strong> berdasarkan data riwayat yang ada.</p>
                 </div>
 
                 <!-- Action Buttons -->
@@ -116,4 +126,56 @@
         </div>
     </div>
 
+    <!-- Include Select2 JS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#balita_select').select2({
+                placeholder: "-- Cari Kode, Nama, atau Orang Tua --",
+                allowClear: true,
+                width: '100%'
+            });
+
+            // Logika perhitungan Usia otomatis
+            const balitaSelect = $('#balita_select');
+            const tanggalInput = $('#tgl_pemeriksaan');
+            const usiaTampil = $('#usia_tampil');
+
+            function hitungUsia() {
+                const option = balitaSelect.find('option:selected');
+                const tglLahirInfo = option.data('tanggal-lahir');
+                const tglPeriksaInfo = tanggalInput.val();
+                
+                if (tglLahirInfo && tglPeriksaInfo) {
+                    const lahir = new Date(tglLahirInfo);
+                    const periksa = new Date(tglPeriksaInfo);
+                    
+                    let months = (periksa.getFullYear() - lahir.getFullYear()) * 12;
+                    months -= lahir.getMonth();
+                    months += periksa.getMonth();
+                    
+                    // Adjust if day of month for periksa is before day of month for lahir
+                    if (periksa.getDate() < lahir.getDate()) {
+                        months--;
+                    }
+
+                    if(months < 0) months = 0;
+                    
+                    // KNN Posyandu uses 1 decimal precision (e.g., 2.1)
+                    const usiaTahunDesimal = (months / 12).toFixed(1);
+                    usiaTampil.val(usiaTahunDesimal + " Tahun");
+                } else {
+                    usiaTampil.val('');
+                }
+            }
+
+            // Bind triggers
+            balitaSelect.on('change', hitungUsia);
+            tanggalInput.on('change', hitungUsia);
+            
+            // Initial call if already filled
+            hitungUsia();
+        });
+    </script>
 </x-app-layout>

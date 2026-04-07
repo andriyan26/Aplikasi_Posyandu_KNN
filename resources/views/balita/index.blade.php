@@ -48,8 +48,10 @@
                 <thead>
                     <tr class="text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wider bg-slate-50 dark:bg-slate-900/50">
                         <th class="px-6 py-4 font-bold rounded-l-xl text-center w-16">No.</th>
+                        <th class="px-6 py-4 font-bold text-center">Kode</th>
+                        <th class="px-6 py-4 font-bold text-center">NIK</th>
                         <th class="px-6 py-4 font-bold">Nama Balita</th>
-                        <th class="px-6 py-4 font-bold text-center">Usia (Bulan)</th>
+                        <th class="px-6 py-4 font-bold text-center">Usia (Tahun)</th>
                         <th class="px-6 py-4 font-bold text-center">L/P</th>
                         <th class="px-6 py-4 font-bold">Orang Tua</th>
                         <th class="px-6 py-4 font-bold text-center rounded-r-xl">Aksi</th>
@@ -61,10 +63,12 @@
                         <td class="px-6 py-5 text-center font-bold text-slate-400 dark:text-slate-600">
                             {{ ($balitas->currentPage() - 1) * $balitas->perPage() + $loop->iteration }}
                         </td>
+                        <td class="px-6 py-5 text-center text-slate-700 dark:text-slate-400 font-medium">{{ $blt->kode }}</td>
+                        <td class="px-6 py-5 text-center text-slate-700 dark:text-slate-400 font-medium">{{ $blt->nik }}</td>
                         <td class="px-6 py-5">
                             <p class="font-bold text-slate-800 dark:text-slate-200">{{ $blt->nama }}</p>
                         </td>
-                        <td class="px-6 py-5 text-center text-slate-700 dark:text-slate-400 font-medium">{{ \Carbon\Carbon::parse($blt->tanggal_lahir)->diffInMonths(now()) }}</td>
+                        <td class="px-6 py-5 text-center text-slate-700 dark:text-slate-400 font-medium">{{ $blt->usia ?? '0.0' }}</td>
                         <td class="px-6 py-5 text-center">
                             @if($blt->jenis_kelamin == 'L')
                                 <span class="bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-bold px-2.5 py-1 rounded-lg text-xs">L</span>
@@ -131,6 +135,10 @@
 
                 <form action="{{ route('balita.store') }}" method="POST" class="px-6 py-6 space-y-5">
                     @csrf
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">NIK</label>
+                        <input type="text" name="nik" required class="w-full rounded-xl sm:text-sm border-slate-300 dark:border-slate-700 shadow-sm focus:ring-blue-500 focus:border-blue-500 p-3 bg-slate-50 dark:bg-slate-900 dark:text-white transition-colors">
+                    </div>
                     <div>
                         <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Nama Lengkap Balita</label>
                         <input type="text" name="nama" required class="w-full rounded-xl sm:text-sm border-slate-300 dark:border-slate-700 shadow-sm focus:ring-blue-500 focus:border-blue-500 p-3 bg-slate-50 dark:bg-slate-900 dark:text-white transition-colors">

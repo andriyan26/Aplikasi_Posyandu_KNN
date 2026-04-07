@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Balita extends Model
 {
-    protected $fillable = ['nama', 'tanggal_lahir', 'jenis_kelamin', 'nama_orang_tua'];
+    protected $fillable = ['kode', 'nik', 'nama', 'usia', 'tanggal_lahir', 'jenis_kelamin', 'nama_orang_tua'];
 
     public function pemeriksaans()
     {

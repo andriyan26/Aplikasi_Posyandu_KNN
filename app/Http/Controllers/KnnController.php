@@ -14,10 +14,9 @@ class KnnController extends Controller
     protected $knnService;
     protected $zScoreService;
 
-    public function __construct(KnnService $knnService, ZScoreService $zScoreService)
+    public function __construct(KnnService $knnService)
     {
         $this->knnService = $knnService;
-        $this->zScoreService = $zScoreService;
     }
 
     public function evaluasi(Request $request)
@@ -30,9 +29,11 @@ class KnnController extends Controller
         foreach ($dataset as $item) {
             $formattedData[] = [
                 'features' => [
+                    $item->usia,
                     $item->berat_badan,
                     $item->tinggi_badan,
-                    $item->z_score ?? 0
+                    $item->lingkar_lengan_atas,
+                    $item->lingkar_kepala
                 ],
                 'label' => $item->status_stunting
             ];
@@ -76,25 +77,25 @@ class KnnController extends Controller
         DB::beginTransaction();
         try {
             while (($data = fgetcsv($handle, 1000, ',')) !== FALSE) {
-                // Format: nama, jenis_kelamin, berat_badan, tinggi_badan, umur_bulan (opt), status_stunting
-                // Index: 0, 1, 2, 3, 4, 5
+                // Format: nama, jenis_kelamin, usia, berat_badan, tinggi_badan, lingkar_lengan_atas, lingkar_kepala, status_stunting
                 
                 $nama = $data[0] ?? 'Anonim';
                 $jk = ($data[1] == 'L' || $data[1] == 'Laki-laki') ? 'L' : 'P';
-                $bb = (float) ($data[2] ?? 0);
-                $tb = (float) ($data[3] ?? 0);
-                $umur = (float) ($data[4] ?? 0);
-                $status = $data[5] ?? 'Rendah';
-
-                // Hitung Z-Score jika memungkinkan
-                $z_score = $this->zScoreService->calculate($tb, $umur, $jk);
+                $usia = (float) ($data[2] ?? 0);
+                $bb = (float) ($data[3] ?? 0);
+                $tb = (float) ($data[4] ?? 0);
+                $lila = (float) ($data[5] ?? 0);
+                $linkep = (float) ($data[6] ?? 0);
+                $status = $data[7] ?? 'Rendah';
 
                 DataLatih::create([
                     'nama' => $nama,
                     'jenis_kelamin' => $jk,
+                    'usia' => $usia,
                     'berat_badan' => $bb,
                     'tinggi_badan' => $tb,
-                    'z_score' => $z_score,
+                    'lingkar_lengan_atas' => $lila,
+                    'lingkar_kepala' => $linkep,
                     'status_stunting' => $status,
                 ]);
                 $count++;
@@ -128,16 +129,16 @@ class KnnController extends Controller
             "Expires"             => "0"
         ];
 
-        $columns = ['nama', 'jenis_kelamin', 'berat_badan', 'tinggi_badan', 'umur_bulan', 'status_stunting'];
+        $columns = ['nama', 'jenis_kelamin', 'usia', 'berat_badan', 'tinggi_badan', 'lingkar_lengan_atas', 'lingkar_kepala', 'status_stunting'];
 
         $callback = function() use ($columns) {
             $file = fopen('php://output', 'w');
             fputcsv($file, $columns);
             
             // Sample Data
-            fputcsv($file, ['Contoh Balita 1', 'L', '10.5', '75.2', '12', 'Rendah']);
-            fputcsv($file, ['Contoh Balita 2', 'P', '14.2', '95.0', '36', 'Sedang']);
-            fputcsv($file, ['Contoh Balita 3', 'L', '18.1', '110.5', '54', 'Tinggi']);
+            fputcsv($file, ['Contoh Balita 1', 'L', '2.0', '10.5', '75.2', '13.5', '45.0', 'Rendah']);
+            fputcsv($file, ['Contoh Balita 2', 'P', '3.1', '14.2', '95.0', '14.0', '48.0', 'Sedang']);
+            fputcsv($file, ['Contoh Balita 3', 'L', '4.5', '18.1', '110.5', '15.5', '50.1', 'Tinggi']);
             
             fclose($file);
         };

@@ -50,9 +50,12 @@
                         <th class="px-6 py-4 font-bold rounded-l-xl text-center w-16">No.</th>
                         <th class="px-6 py-4 font-bold text-center">Tanggal</th>
                         <th class="px-6 py-4 font-bold">Nama Balita</th>
-                        <th class="px-6 py-4 font-bold text-center">Metrik (BB/TB)</th>
-                        <th class="px-6 py-4 font-bold text-center">Z-Score</th>
-                        <th class="px-6 py-4 font-bold text-center">Status Stunting</th>
+                        <th class="px-6 py-4 font-bold text-center">Usia</th>
+                        <th class="px-6 py-4 font-bold text-center">BB (kg)</th>
+                        <th class="px-6 py-4 font-bold text-center">TB (cm)</th>
+                        <th class="px-6 py-4 font-bold text-center">LiLA (cm)</th>
+                        <th class="px-6 py-4 font-bold text-center">LiKep (cm)</th>
+                        <th class="px-6 py-4 font-bold text-center">Risiko Stunting</th>
                         <th class="px-6 py-4 font-bold text-center rounded-r-xl">Aksi</th>
                     </tr>
                 </thead>
@@ -69,13 +72,11 @@
                             <p class="font-bold text-slate-800 dark:text-white">{{ $p->balita->nama ?? '-' }}</p>
                             <p class="text-[10px] uppercase font-extrabold text-slate-400 dark:text-slate-500 tracking-widest">Orang Tua: {{ $p->balita->nama_orang_tua ?? '-' }}</p>
                         </td>
-                        <td class="px-6 py-5 text-center">
-                            <div class="flex items-center justify-center gap-2">
-                                <span class="bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 font-bold px-2 py-0.5 rounded text-[10px] border border-blue-100 dark:border-blue-800">{{ $p->berat_badan }} kg</span>
-                                <span class="bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-400 font-bold px-2 py-0.5 rounded text-[10px] border border-indigo-100 dark:border-indigo-800">{{ $p->tinggi_badan }} cm</span>
-                            </div>
-                        </td>
-                        <td class="px-6 py-5 text-center font-bold text-slate-700 dark:text-slate-300 italic">{{ number_format($p->z_score, 2) }}</td>
+                        <td class="px-6 py-5 text-center text-slate-700 dark:text-slate-400">{{ number_format((float)$p->usia_saat_periksa, 1, '.', '') }}</td>
+                        <td class="px-6 py-5 text-center text-slate-700 dark:text-slate-400">{{ number_format((float)$p->berat_badan, 1, '.', '') }}</td>
+                        <td class="px-6 py-5 text-center text-slate-700 dark:text-slate-400">{{ number_format((float)$p->tinggi_badan, 1, '.', '') }}</td>
+                        <td class="px-6 py-5 text-center text-slate-700 dark:text-slate-400">{{ number_format((float)$p->lingkar_lengan_atas, 1, '.', '') }}</td>
+                        <td class="px-6 py-5 text-center text-slate-700 dark:text-slate-400">{{ number_format((float)$p->lingkar_kepala, 1, '.', '') }}</td>
                         <td class="px-6 py-5 text-center">
                             @php
                                 $statusClasses = match(strtolower($p->status_stunting)) {
@@ -91,18 +92,19 @@
                             </span>
                         </td>
                         <td class="px-6 py-5 text-center">
-                            <form action="{{ route('pemeriksaan.destroy', $p->id) }}" method="POST" class="inline" onsubmit="return confirm('Hapus riwayat pemeriksaan {{ $p->balita->nama ?? '' }}?');">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="text-red-500 hover:text-red-600 bg-red-50 dark:bg-red-900/20 p-2 rounded-lg transition" title="Hapus">
-                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                </button>
-                            </form>
+                            <div class="flex items-center justify-center gap-2 flex-nowrap">
+                                <a href="{{ route('pemeriksaan.show', $p->id) }}" class="text-blue-500 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/20 dark:hover:bg-blue-800/40 p-2 rounded-lg transition shadow-sm" title="Lihat Detail Pengukuran">
+                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                </a>
+                                <a href="{{ route('pemeriksaan.pdf_single', $p->id) }}" target="_blank" class="text-rose-500 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 dark:bg-rose-900/20 dark:hover:bg-rose-800/40 p-2 rounded-lg transition shadow-sm" title="Download Data by PDF">
+                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                </a>
+                            </div>
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="px-6 py-12 text-center text-slate-500 font-medium">
+                        <td colspan="9" class="px-6 py-12 text-center text-slate-500 font-medium">
                             @if(request('search'))
                                 Tidak ditemukan hasil untuk pencarian "{{ request('search') }}".
                             @else

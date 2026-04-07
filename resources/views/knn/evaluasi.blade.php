@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        EVALUASI MODEL KNN
+        DATA TRAINING & EVALUASI MODEL KNN
     </x-slot>
 
     <div class="w-full max-w-7xl mx-auto pb-12 px-4 sm:px-6">
@@ -289,49 +289,52 @@
                     <thead
                         class="bg-slate-50/50 dark:bg-slate-900/50 text-slate-400 dark:text-slate-500 text-[10px] font-black uppercase tracking-widest border-b border-slate-100 dark:border-slate-800">
                         <tr>
-                            <th class="p-5 text-left">Balita</th>
-                            <th class="p-5 text-center">J. Kelamin</th>
-                            <th class="p-5 text-center">BB/TB</th>
-                            <th class="p-5 text-center">Umur (Bln)</th>
-                            <th class="p-5 text-center">Z-Score</th>
-                            <th class="p-5 text-right italic">Klasifikasi</th>
+                            <th class="p-5 text-center">No</th>
+                            <th class="p-5 text-left">Nama</th>
+                            <th class="p-5 text-center">Usia</th>
+                            <th class="p-5 text-center">BB (kg)</th>
+                            <th class="p-5 text-center">TB (cm)</th>
+                            <th class="p-5 text-center">LiLA (cm)</th>
+                            <th class="p-5 text-center">LiKep (cm)</th>
+                            <th class="p-5 text-right italic">Risiko Stunting</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
                         @forelse($dataLatih as $item)
                             <tr class="hover:bg-blue-50/30 dark:hover:bg-blue-900/10 transition-colors">
+                                <td class="p-5 text-center text-xs font-bold text-slate-500">
+                                    {{ $loop->iteration }}
+                                </td>
                                 <td class="p-5">
                                     <p class="text-xs font-black text-slate-700 dark:text-slate-200">{{ $item->nama }}</p>
-                                    <p
-                                        class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter mt-0.5 italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic">
-                                        Training Data Record</p>
-                                </td>
-                                <td class="p-5 text-center">
-                                    <span
-                                        class="bg-slate-100 dark:bg-slate-700/50 px-2.5 py-1 rounded-md text-[9px] font-black text-slate-500 uppercase">{{ $item->jenis_kelamin }}</span>
+                                    <p class="text-[9px] font-bold text-slate-400 uppercase mt-0.5 italic text-slate-500">
+                                        Data Latih ({{ $item->jenis_kelamin }})</p>
                                 </td>
                                 <td class="p-5 text-center text-[11px] text-slate-600 dark:text-slate-400 font-bold italic">
-                                    {{ $item->berat_badan }} / {{ $item->tinggi_badan }}
+                                    {{ number_format((float) $item->usia, 1, '.', '') }}
                                 </td>
                                 <td class="p-5 text-center text-[11px] text-slate-600 dark:text-slate-400 font-bold italic">
-                                    {{ $item->umur_bulan }}
+                                    {{ number_format((float) $item->berat_badan, 1, '.', '') }}
                                 </td>
-                                <td class="p-5 text-center">
-                                    <div
-                                        class="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-50 dark:bg-slate-900 rounded-lg text-xs font-black italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic italic text-slate-500">
-                                        {{ round($item->z_score, 2) }}
-                                    </div>
+                                <td class="p-5 text-center text-[11px] text-slate-600 dark:text-slate-400 font-bold italic">
+                                    {{ number_format((float) $item->tinggi_badan, 1, '.', '') }}
+                                </td>
+                                <td class="p-5 text-center text-[11px] text-slate-600 dark:text-slate-400 font-bold italic">
+                                    {{ number_format((float) $item->lingkar_lengan_atas, 1, '.', '') }}
+                                </td>
+                                <td class="p-5 text-center text-[11px] text-slate-600 dark:text-slate-400 font-bold italic">
+                                    {{ number_format((float) $item->lingkar_kepala, 1, '.', '') }}
                                 </td>
                                 <td class="p-5 text-right">
                                     <span
-                                        class="px-4 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-sm {{ $item->status_stunting == 'Rendah' ? 'bg-emerald-500 text-white shadow-emerald-200' : ($item->status_stunting == 'Sedang' ? 'bg-amber-500 text-white shadow-amber-200' : 'bg-rose-500 text-white shadow-rose-200') }}">
+                                        class="px-4 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-sm {{ $item->status_stunting == 'Rendah' ? 'bg-green-500 text-white shadow-green-200' : ($item->status_stunting == 'Sedang' ? 'bg-amber-500 text-white shadow-amber-200' : 'bg-red-500 text-white shadow-red-200') }}">
                                         {{ $item->status_stunting }}
                                     </span>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6"
+                                <td colspan="8"
                                     class="p-16 text-center text-slate-400 dark:text-slate-700 text-xs font-black uppercase tracking-[0.2em] italic">
                                     Belum ada data pelatihan teridentifikasi</td>
                             </tr>

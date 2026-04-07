@@ -7,6 +7,7 @@ use App\Http\Controllers\PemeriksaanController;
 use App\Http\Controllers\KnnController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ImportController;
+use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -21,6 +22,7 @@ Route::middleware('auth')->group(function () {
         'balita' => 'balita'
     ]);
     Route::resource('pemeriksaan', PemeriksaanController::class);
+    Route::get('/pemeriksaan/{pemeriksaan}/pdf', [PemeriksaanController::class, 'pdfSingle'])->name('pemeriksaan.pdf_single');
 
     // Profile (from Breeze)
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -34,6 +36,10 @@ Route::middleware('auth')->group(function () {
         Route::delete('/knn/destroy-all', [KnnController::class, 'destroyAll'])->name('knn.destroy_all');
         Route::get('/knn/template', [KnnController::class, 'downloadTemplate'])->name('knn.template');
         Route::post('/kunjungan/import', [ImportController::class, 'importCsv'])->name('kunjungan.import');
+        
+        // Reports
+        Route::get('/report', [ReportController::class, 'index'])->name('report.index');
+        Route::get('/report/pdf', [ReportController::class, 'downloadPdf'])->name('report.pdf');
     });
 
     // Admin Only Actions (User Management)

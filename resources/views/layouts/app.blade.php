@@ -52,73 +52,60 @@
                         </div>
 
                         <!-- Right Side: Topbar Profile Dropdown -->
-                        <div class="flex items-center shrink-0 gap-4" x-data="{ 
-                            darkMode: localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches),
-                            toggleTheme() {
-                                this.darkMode = !this.darkMode;
-                                if (this.darkMode) {
-                                    document.documentElement.classList.add('dark');
-                                    localStorage.theme = 'dark';
-                                } else {
-                                    document.documentElement.classList.remove('dark');
-                                    localStorage.theme = 'light';
-                                }
-                            }
-                        }">
-                            <x-dropdown align="right" width="56">
+                        <div class="flex items-center shrink-0 gap-4">
+                            <x-dropdown align="right" width="64" contentClasses="py-1 bg-white dark:bg-slate-800 border dark:border-slate-700">
                                 <x-slot name="trigger">
                                     <button class="flex items-center p-1.5 rounded-full hover:bg-white/10 focus:outline-none transition-all group border border-white/10">
                                         <div class="h-8 w-8 rounded-full bg-white/20 flex items-center justify-center overflow-hidden">
-                                            <span class="text-xs font-bold">{{ substr(Auth::user()->name, 0, 1) }}</span>
+                                            @if(Auth::user()->foto)
+                                                <img src="{{ asset('storage/' . Auth::user()->foto) }}" class="w-full h-full object-cover" alt="Profile">
+                                            @else
+                                                <span class="text-xs font-bold">{{ substr(Auth::user()->name, 0, 1) }}</span>
+                                            @endif
                                         </div>
                                         <svg class="h-4 w-4 ml-1 text-white opacity-60 group-hover:opacity-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                     </button>
                                 </x-slot>
                                 <x-slot name="content">
-                                    <div class="px-3 py-2 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-700">
-                                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-tight">Masuk Sebagai</p>
-                                        <p class="text-[11px] font-black text-slate-700 dark:text-slate-200 truncate">{{ Auth::user()->email }}</p>
-                                    </div>
- 
-                                    <!-- Theme Selection -->
-                                    <div class="px-1 py-1">
-                                        <button @click.stop="toggleTheme(); $dispatch('close-dropdown')" class="w-full flex items-center px-2 py-1.5 text-[11px] font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors group">
-                                            <div class="flex items-center w-full">
-                                                <template x-if="!darkMode">
-                                                    <div class="flex items-center w-full">
-                                                        <svg style="width: 14px; height: 14px;" class="mr-2 text-amber-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 100 2h1z"/></svg>
-                                                        <span>Mode Terang</span>
-                                                    </div>
-                                                </template>
-                                                <template x-if="darkMode">
-                                                    <div class="flex items-center w-full">
-                                                        <svg style="width: 14px; height: 14px;" class="mr-2 text-indigo-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/></svg>
-                                                        <span class="text-indigo-400">Mode Gelap</span>
-                                                    </div>
-                                                </template>
+                                    <div class="p-1 px-2" x-data="{
+                                        isDark: document.documentElement.classList.contains('dark')
+                                    }">
+                                        <!-- Header Profile -->
+                                        <div class="px-3 py-3 bg-slate-50 dark:bg-slate-900 rounded-md mb-2 shadow-sm border border-slate-100 dark:border-slate-700/50 overflow-hidden">
+                                            <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest leading-tight mb-1">Masuk Sebagai</p>
+                                            <p class="text-sm font-black text-slate-800 dark:text-slate-200 truncate" title="{{ Auth::user()->email }}">{{ Auth::user()->email }}</p>
+                                        </div>
+     
+                                        <!-- Theme Selection -->
+                                        <button @click.prevent="isDark = !isDark; isDark ? (document.documentElement.classList.add('dark'), localStorage.setItem('theme', 'dark')) : (document.documentElement.classList.remove('dark'), localStorage.setItem('theme', 'light'));" type="button" class="w-full flex items-center px-3 py-2.5 text-sm font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-md transition-colors">
+                                            <div class="flex items-center w-full" x-show="!isDark">
+                                                <svg class="w-5 h-5 mr-3 text-amber-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 100 2h1z"/></svg>
+                                                <span>Ubah ke Mode Gelap</span>
+                                            </div>
+                                            <div class="flex items-center w-full" x-show="isDark" style="display: none;">
+                                                <svg class="w-5 h-5 mr-3 text-indigo-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/></svg>
+                                                <span>Ubah ke Mode Terang</span>
                                             </div>
                                         </button>
-                                    </div>
- 
-                                    <div class="border-t border-slate-100 dark:border-slate-800 my-0.5 mx-1"></div>
- 
-                                    <div class="px-1 py-1">
-                                        <x-dropdown-link :href="route('profile.edit')" class="!p-0 border-none">
-                                            <div class="flex items-center px-2 py-1.5 text-[11px] font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-all">
-                                                <svg style="width: 14px; height: 14px;" class="mr-2 opacity-70 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                                                <span>Pengaturan Akun</span>
-                                            </div>
-                                        </x-dropdown-link>
-                                    </div>
- 
-                                    <div class="border-t border-slate-100 dark:border-slate-800 my-0.5 mx-1"></div>
- 
-                                    <div class="px-1 py-1">
+                                        
+                                        <!-- Divider -->
+                                        <div class="h-px w-full bg-slate-100 dark:bg-slate-700 my-1"></div>
+     
+                                        <!-- Profile -->
+                                        <a href="{{ route('profile.edit') }}" class="w-full flex items-center px-3 py-2.5 text-sm font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-md transition-colors">
+                                            <svg class="w-5 h-5 mr-3 opacity-70 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                                            <span class="whitespace-nowrap">Pengaturan Akun</span>
+                                        </a>
+     
+                                        <!-- Divider -->
+                                        <div class="h-px w-full bg-slate-100 dark:bg-slate-700 my-1"></div>
+     
+                                        <!-- Logout -->
                                         <form method="POST" action="{{ route('logout') }}">
                                             @csrf
-                                            <button type="submit" class="w-full flex items-center px-2 py-1.5 text-[11px] font-extrabold text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all uppercase tracking-widest">
-                                                <svg style="width: 14px; height: 14px;" class="mr-2 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-                                                Keluar
+                                            <button type="submit" class="w-full flex items-center px-3 py-2.5 text-xs font-extrabold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-md transition-all uppercase tracking-widest">
+                                                <svg class="w-5 h-5 mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                                                <span>Keluar</span>
                                             </button>
                                         </form>
                                     </div>
