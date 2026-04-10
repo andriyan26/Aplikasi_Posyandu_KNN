@@ -102,7 +102,7 @@ class KnnController extends Controller
             }
             DB::commit();
             fclose($handle);
-            return redirect()->back()->with('success', "Berhasil mengimport {$count} data latih.");
+            return redirect()->route('knn.evaluasi', ['k_value' => $request->k_value ?? 3])->with('success', "Berhasil mengimport {$count} data latih.");
         } catch (\Exception $e) {
             DB::rollBack();
             fclose($handle);

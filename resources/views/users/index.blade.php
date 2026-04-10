@@ -99,7 +99,7 @@
                                 </button>
                                 
                                 @if(Auth::id() !== $usr->id)
-                                <form action="{{ route('users.destroy', $usr->id) }}" method="POST" class="inline" onsubmit="return confirm('Hapus permanen akun {{ addslashes($usr->name) }}?');">
+                                <form action="{{ route('users.destroy', $usr->id) }}" method="POST" class="inline" onsubmit="event.preventDefault(); Swal.fire({title: 'Hapus Akun Ini?', text: 'Hapus permanen akun {{ addslashes($usr->name) }}? Tindakan ini tidak dapat dibatalkan.', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', cancelButtonColor: '#64748b', confirmButtonText: 'Ya, Hapus!', cancelButtonText: 'Batal', customClass: { popup: 'rounded-3xl' }}).then((result) => { if (result.isConfirmed) { this.submit(); } });">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="text-red-500 hover:text-red-600 bg-red-50 dark:bg-red-900/20 p-2 rounded-lg transition" title="Hapus Akun">

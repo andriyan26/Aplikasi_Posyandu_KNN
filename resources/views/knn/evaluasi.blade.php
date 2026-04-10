@@ -8,7 +8,7 @@
         <!-- Action Row (K-Value & Upload CSV) - RE-CONSTRAINED -->
         <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch mb-10">
 
-            <!-- Left: Parameter K -->
+            <!-- Left: Download Template -->
             <div
                 class="bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700/50 p-6 flex flex-col hover:shadow-md transition-all duration-300">
                 <div class="flex items-center gap-3 mb-5">
@@ -16,20 +16,21 @@
                         class="h-10 w-10 shrink-0 bg-blue-50 dark:bg-blue-900/40 rounded-xl flex items-center justify-center text-blue-600 dark:text-blue-400">
                         <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                                d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                         </svg>
                     </div>
-                    <h3 class="text-xs font-black text-slate-800 dark:text-white uppercase tracking-[0.2em]">Parameter K
+                    <h3 class="text-xs font-black text-slate-800 dark:text-white uppercase tracking-[0.2em]">Template CSV
                     </h3>
                 </div>
-                <form action="{{ route('knn.evaluasi') }}" method="GET" class="space-y-4 mt-auto">
-                    <input type="number" name="k_value" value="{{ request('k_value', 3) }}" min="1" max="50"
-                        class="w-full rounded-2xl border-slate-200 dark:border-slate-700 dark:bg-slate-900 dark:text-white text-sm font-bold p-3 focus:ring-blue-500 focus:border-blue-500 transition-all text-center">
-                    <button type="submit"
-                        class="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-black uppercase tracking-widest py-3.5 rounded-2xl shadow-lg shadow-blue-200 dark:shadow-none transition transform active:scale-95">
-                        Uji Akurasi
-                    </button>
-                </form>
+                <div class="mb-5">
+                    <p class="text-[11px] text-slate-500 dark:text-slate-400 font-bold leading-relaxed">
+                        Unduh template ini untuk memastikan format data Anda sesuai dengan standar sistem. Mode ini mencegah kehilangan format setelah unggah data.
+                    </p>
+                </div>
+                <a href="{{ route('knn.template') }}"
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-black uppercase tracking-widest py-3.5 rounded-2xl shadow-lg shadow-blue-200 dark:shadow-none transition transform active:scale-95 text-center flex items-center justify-center mt-auto">
+                    Unduh Template
+                </a>
             </div>
 
             <!-- Right: Upload Dataset -->
@@ -37,7 +38,7 @@
                 class="bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700/50 p-6 flex flex-col hover:shadow-md transition-all duration-300">
                 <div class="flex items-center gap-3 mb-5">
                     <div
-                        class="h-10 w-10 shrink-0 bg-emerald-50 dark:bg-emerald-900/40 rounded-xl flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+                        class="h-10 w-10 shrink-0 bg-blue-50 dark:bg-blue-900/40 rounded-xl flex items-center justify-center text-blue-600 dark:text-blue-400">
                         <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
                                 d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
@@ -51,21 +52,27 @@
                     class="space-y-4 mt-auto">
                     @csrf
                     <div class="relative group">
-                        <input type="file" name="file_csv" accept=".csv" required
+                        <input type="file" name="file_csv" id="file_csv" accept=".csv" required
                             class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
                         <div
-                            class="w-full border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-2xl py-3 px-4 text-center text-slate-400 dark:text-slate-500 group-hover:border-emerald-500 transition-colors flex items-center justify-center gap-2">
+                            id="file_upload_zone" class="w-full border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-2xl py-3 px-4 text-center text-slate-400 dark:text-slate-500 group-hover:border-blue-500 transition-colors flex items-center justify-center gap-2 bg-slate-50 dark:bg-slate-900">
                             <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
                                 <path d="M12 4v16m8-8H4" stroke-width="2.5"></path>
                             </svg>
-                            <span class="text-[10px] font-black uppercase tracking-widest">Pilih Berkas</span>
+                            <span id="file_name_display" class="text-[10px] font-black uppercase tracking-widest leading-none">Pilih Berkas</span>
                         </div>
                     </div>
-                    <button type="submit"
-                        class="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-black uppercase tracking-widest py-3.5 rounded-2xl shadow-lg shadow-blue-200 dark:shadow-none transition transform active:scale-95">
-                        Unggah Data
-                    </button>
+                    
+                    <div id="hidden_k_input" class="hidden space-y-3 mt-4">
+                        <label class="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest block text-center mt-2">Parameter K</label>
+                        <input type="number" name="k_value" value="{{ request('k_value', 3) }}" min="1" max="50" required
+                            class="w-full rounded-2xl border-slate-200 dark:border-slate-700 dark:bg-slate-900 dark:text-white text-sm font-bold p-3 focus:ring-blue-500 focus:border-blue-500 transition-all text-center">
+                        <button type="submit"
+                            class="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-black uppercase tracking-widest py-3.5 rounded-2xl shadow-lg shadow-blue-200 dark:shadow-none transition transform active:scale-95 mt-4">
+                            Unggah Data
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>
@@ -203,7 +210,7 @@
         @else
             <!-- Empty State - RE-CONSTRAINED -->
             <div
-                class="max-w-2xl mx-auto bg-white dark:bg-slate-800 rounded-[40px] shadow-sm p-12 text-center border border-slate-100 dark:border-slate-700/50 shadow-blue-50/50 relative overflow-hidden mb-10">
+                class="max-w-2xl mx-auto bg-white dark:bg-slate-800 rounded-[40px] shadow-sm py-8 px-12 text-center border border-slate-100 dark:border-slate-700/50 shadow-blue-50/50 relative overflow-hidden mb-10">
                 <div
                     class="absolute -top-12 -right-12 w-48 h-48 bg-blue-50 dark:bg-blue-900/10 rounded-full blur-3xl opacity-50">
                 </div>
@@ -220,27 +227,9 @@
                     <h3 class="text-xl font-black text-slate-800 dark:text-white mb-2 uppercase tracking-wide">Data
                         Pelatihan Masih Kosong</h3>
                     <p
-                        class="text-slate-400 dark:text-slate-500 max-w-sm mx-auto leading-relaxed text-[11px] mb-8 font-bold italic">
+                        class="text-slate-400 dark:text-slate-500 max-w-sm mx-auto leading-relaxed text-[11px] mb-0 font-bold italic">
                         Sistem membutuhkan dataset historis untuk melatih algoritma KNN. Unggah berkas CSV untuk memulai
                         analisis stunting.</p>
-
-                    <div class="flex justify-center">
-                        <a href="{{ route('knn.template') }}"
-                            class="group relative inline-flex items-center gap-4 bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-2xl shadow-xl shadow-blue-200 dark:shadow-none transition-all hover:-translate-y-1">
-                            <div class="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center">
-                                <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-                                </svg>
-                            </div>
-                            <div class="text-left">
-                                <p class="text-[10px] font-black uppercase tracking-widest opacity-70 leading-none mb-1">
-                                    Dapatkan Contoh</p>
-                                <p class="text-xs font-black uppercase tracking-widest leading-none">Unduh Template CSV</p>
-                            </div>
-                        </a>
-                    </div>
                 </div>
             </div>
         @endif
@@ -270,7 +259,7 @@
                 </div>
                 @if($totalData > 0)
                     <form action="{{ route('knn.destroy_all') }}" method="POST"
-                        onsubmit="return confirm('Hapus semua data latih?')">
+                        onsubmit="event.preventDefault(); Swal.fire({title: 'Reset Data Latih?', text: 'Seluruh data set pelatihan akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', cancelButtonColor: '#64748b', confirmButtonText: 'Ya, Reset Data!', cancelButtonText: 'Batal', customClass: { popup: 'rounded-3xl' }}).then((result) => { if (result.isConfirmed) { this.submit(); } });">
                         @csrf @method('DELETE')
                         <button type="submit"
                             class="px-6 py-2.5 bg-red-50 dark:bg-red-900/20 text-red-500 rounded-xl text-[9px] font-black uppercase tracking-[0.2em] hover:bg-red-100 dark:hover:bg-red-900/40 transition-all flex items-center gap-2 border border-red-100 dark:border-red-900/30">
@@ -402,5 +391,36 @@
                 });
             </script>
         </x-slot>
+    @else
+        <x-slot name="scripts">
+            <script>
+                // Need an empty script slot to ensure our upload logic has somewhere to go if no data
+            </script>
+        </x-slot>
     @endif
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileInput = document.getElementById('file_csv');
+            const fileNameDisplay = document.getElementById('file_name_display');
+            const hiddenKInput = document.getElementById('hidden_k_input');
+            const fileUploadZone = document.getElementById('file_upload_zone');
+
+            if(fileInput) {
+                fileInput.addEventListener('change', function(e) {
+                    if (this.files && this.files[0]) {
+                        fileNameDisplay.textContent = this.files[0].name;
+                        fileUploadZone.classList.add('border-blue-500', 'text-blue-600', 'bg-blue-50', 'dark:bg-blue-900/10');
+                        fileUploadZone.classList.remove('border-slate-200', 'text-slate-400', 'bg-slate-50', 'dark:bg-slate-900');
+                        hiddenKInput.classList.remove('hidden');
+                    } else {
+                        fileNameDisplay.textContent = 'Pilih Berkas';
+                        fileUploadZone.classList.remove('border-blue-500', 'text-blue-600', 'bg-blue-50', 'dark:bg-blue-900/10');
+                        fileUploadZone.classList.add('border-slate-200', 'text-slate-400', 'bg-slate-50', 'dark:bg-slate-900');
+                        hiddenKInput.classList.add('hidden');
+                    }
+                });
+            }
+        });
+    </script>
 </x-app-layout>

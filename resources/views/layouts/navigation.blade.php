@@ -81,7 +81,7 @@
                 </button>
                 <div x-show="open" x-transition.opacity
                     class="pl-4 pr-1 mt-1 space-y-1 border-l-2 border-slate-100 dark:border-slate-800 ml-6"
-                    style="display: {{ request()->routeIs('balita.*') || request()->routeIs('users.*') ? 'block' : 'none' }};">
+                    @if(request()->routeIs('balita.*') || request()->routeIs('users.*')) style="display: block;" @else style="display: none;" @endif>
 
                     @if(Auth::user()->role === 'admin')
                         <a href="{{ route('users.index') }}"
@@ -132,7 +132,7 @@
                 </button>
                 <div x-show="open" x-transition.opacity
                     class="pl-4 pr-1 mt-1 space-y-1 border-l-2 border-slate-100 dark:border-slate-800 ml-6"
-                    style="display: {{ request()->routeIs('pemeriksaan.*') || request()->routeIs('knn.*') ? 'block' : 'none' }};">
+                    @if(request()->routeIs('pemeriksaan.*') || request()->routeIs('knn.*')) style="display: block;" @else style="display: none;" @endif>
 
                     <a href="{{ route('pemeriksaan.index') }}"
                         class="flex items-center px-4 py-3 rounded-xl transition duration-200 font-bold text-xs tracking-wide group {{ request()->routeIs('pemeriksaan.*') ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-700' }}">
@@ -180,7 +180,7 @@
                 </button>
                 <div x-show="open" x-transition.opacity
                     class="pl-4 pr-1 mt-1 space-y-1 border-l-2 border-slate-100 dark:border-slate-800 ml-6"
-                    style="display: {{ request()->routeIs('report.*') ? 'block' : 'none' }};">
+                    @if(request()->routeIs('report.*')) style="display: block;" @else style="display: none;" @endif>
 
                     <a href="{{ route('report.index') }}"
                         class="flex items-center px-4 py-3 rounded-xl transition duration-200 font-bold text-xs tracking-wide group {{ request()->routeIs('report.*') ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-700' }}">
