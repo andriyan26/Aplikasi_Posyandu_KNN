@@ -17,6 +17,11 @@ Route::get('/', function () {
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+    // Extracted Balita Routes (Export/Import)
+    Route::get('/balita/export-data', [BalitaController::class, 'exportData'])->name('balita.export_data');
+    Route::post('/balita/import/preview', [BalitaController::class, 'importPreview'])->name('balita.import_preview');
+    Route::post('/balita/import/process', [BalitaController::class, 'importProcess'])->name('balita.import_process');
+
     // CRUD Posyandu
     Route::resource('balita', BalitaController::class)->parameters([
         'balita' => 'balita'

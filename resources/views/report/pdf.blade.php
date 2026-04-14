@@ -18,42 +18,71 @@
 <body>
 
     <div class="header">
-        <h1>LAPORAN DATA PEMERIKSAAN POSYANDU</h1>
-        <p>Bulan: {{ $namaBulan }} {{ $tahun }}</p>
+        @if($balita_id)
+            @php $namaAnak = \App\Models\Balita::find($balita_id)->nama ?? 'Anak'; @endphp
+            <h1>LAPORAN PERKEMBANGAN BALITA: {{ strtoupper($namaAnak) }}</h1>
+            <p>Periode: {{ $namaBulan }} - {{ $namaBulanAkhir }} Tahun {{ $tahun }}</p>
+        @else
+            <h1>LAPORAN BULANAN DATA PEMERIKSAAN POSYANDU</h1>
+            <p>Bulan: {{ $namaBulan }} {{ $tahun }}</p>
+        @endif
     </div>
 
     <table>
         <thead>
             <tr>
                 <th class="text-center" width="5%">No</th>
-                <th width="15%">Tanggal</th>
-                <th width="20%">Nama Balita</th>
-                <th class="text-center" width="10%">Usia (Th)</th>
-                <th class="text-center" width="10%">BB (kg)</th>
-                <th class="text-center" width="10%">TB (cm)</th>
-                <th class="text-center" width="10%">LiLA (cm)</th>
-                <th class="text-center" width="10%">LiKep (cm)</th>
-                <th class="text-center" width="10%">Risiko</th>
+                @if($balita_id)
+                    <th width="20%">Tanggal Periksa</th>
+                    <th class="text-center" width="15%">Usia (Bulan)</th>
+                @else
+                    <th width="35%">Nama Balita</th>
+                    <th width="15%">Status / Tgl</th>
+                @endif
+                <th class="text-center" width="15%">BB (kg)</th>
+                <th class="text-center" width="15%">TB (cm)</th>
+                <th class="text-center" width="15%">Risiko Stunting</th>
             </tr>
         </thead>
         <tbody>
-            @forelse($pemeriksaans as $p)
-            <tr>
-                <td class="text-center">{{ $loop->iteration }}</td>
-                <td>{{ \Carbon\Carbon::parse($p->tanggal_pemeriksaan)->format('d/m/Y') }}</td>
-                <td>{{ $p->balita->nama ?? '-' }}</td>
-                <td class="text-center">{{ number_format((float)$p->usia_saat_periksa, 1) }}</td>
-                <td class="text-center">{{ number_format((float)$p->berat_badan, 1) }}</td>
-                <td class="text-center">{{ number_format((float)$p->tinggi_badan, 1) }}</td>
-                <td class="text-center">{{ number_format((float)$p->lingkar_lengan_atas, 1) }}</td>
-                <td class="text-center">{{ number_format((float)$p->lingkar_kepala, 1) }}</td>
-                <td class="text-center"><strong>{{ $p->status_stunting }}</strong></td>
-            </tr>
-            @empty
-            <tr>
-                <td colspan="9" class="text-center">Tidak ada data pemeriksaan pada bulan ini.</td>
-            </tr>
-            @endforelse
+            @if($balita_id)
+                @forelse($pemeriksaans as $p)
+                <tr>
+                    <td class="text-center">{{ $loop->iteration }}</td>
+                    <td>{{ \Carbon\Carbon::parse($p->tanggal_pemeriksaan)->format('d/m/Y') }}</td>
+                    <td class="text-center">{{ number_format((float)$p->usia_saat_periksa, 1) }}</td>
+                    <td class="text-center">{{ number_format((float)$p->berat_badan, 1) }}</td>
+                    <td class="text-center">{{ number_format((float)$p->tinggi_badan, 1) }}</td>
+                    <td class="text-center"><strong>{{ $p->status_stunting }}</strong></td>
+                </tr>
+                @empty
+                <tr>
+                    <td colspan="6" class="text-center">Tidak ada data pemeriksaan pada periode ini.</td>
+                </tr>
+                @endforelse
+            @else
+                @forelse($balitas as $balita)
+                @php $p = $balita->pemeriksaans->first(); @endphp
+                <tr style="{{ !$p ? 'background-color: #fff5f5; color: #888;' : '' }}">
+                    <td class="text-center">{{ $loop->iteration }}</td>
+                    <td><strong>{{ $balita->nama }}</strong></td>
+                    <td>
+                        @if($p)
+                            {{ \Carbon\Carbon::parse($p->tanggal_pemeriksaan)->format('d/m/Y') }}
+                        @else
+                            <em>Tidak Diperiksa</em>
+                        @endif
+                    </td>
+                    <td class="text-center">{{ $p ? number_format((float)$p->berat_badan, 1) : '-' }}</td>
+                    <td class="text-center">{{ $p ? number_format((float)$p->tinggi_badan, 1) : '-' }}</td>
+                    <td class="text-center"><strong>{{ $p->status_stunting ?? '-' }}</strong></td>
+                </tr>
+                @empty
+                <tr>
+                    <td colspan="6" class="text-center">Belum ada balita terdaftar.</td>
+                </tr>
+                @endforelse
+            @endif
         </tbody>
     </table>
 

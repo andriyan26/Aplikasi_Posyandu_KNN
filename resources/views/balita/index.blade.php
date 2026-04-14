@@ -36,7 +36,15 @@
                     </div>
                 </form>
 
-                <button onclick="document.getElementById('modal-tambah').classList.remove('hidden')" class="bg-[#00b488] hover:bg-[#009b75] text-white text-sm font-bold py-1.5 px-5 rounded-full shadow-sm hover:shadow transition-all flex items-center gap-2 shrink-0 border border-green-600/10">
+                <button type="button" onclick="exportExcel()" class="bg-white dark:bg-slate-800 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 text-sm font-bold py-1.5 px-5 rounded-full shadow-sm hover:shadow transition-all flex items-center gap-2 shrink-0 border border-green-500">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    Export Excel
+                </button>
+                <button type="button" onclick="document.getElementById('modal-import').classList.remove('hidden')" class="bg-white dark:bg-slate-800 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 text-sm font-bold py-1.5 px-5 rounded-full shadow-sm hover:shadow transition-all flex items-center gap-2 shrink-0 border border-blue-500">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                    Import Excel
+                </button>
+                <button type="button" onclick="document.getElementById('modal-tambah').classList.remove('hidden')" class="bg-[#00b488] hover:bg-[#009b75] text-white text-sm font-bold py-1.5 px-5 rounded-full shadow-sm hover:shadow transition-all flex items-center gap-2 shrink-0 border border-green-600/10">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
                     Tambah Data
                 </button>
@@ -170,6 +178,215 @@
                 </form>
             </div>
         </div>
+    </div> <!-- Added missing closing div for modal-tambah -->
+
+    <!-- Modal Import Balita -->
+    <div id="modal-import" class="fixed inset-0 z-[100] hidden overflow-y-auto">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 transition-opacity" aria-hidden="true" onclick="closeImportModal()">
+                <div class="absolute inset-0 bg-slate-900 opacity-60 backdrop-blur-sm"></div>
+            </div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom bg-white dark:bg-slate-800 rounded-[24px] text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full border border-slate-100 dark:border-slate-700 relative z-50 transition-colors">
+                
+                <div class="bg-blue-600 px-6 py-4 flex justify-between items-center">
+                    <h3 class="text-lg leading-6 font-bold text-white tracking-wide">Import Data Excel</h3>
+                    <button type="button" onclick="closeImportModal()" class="text-white hover:text-slate-200">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
+                </div>
+
+                <div class="px-6 py-6 space-y-5">
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Upload File Excel (.xlsx)</label>
+                        <input type="file" id="file-upload" accept=".xlsx, .xls, .csv" class="w-full rounded-xl sm:text-sm border-slate-300 dark:border-slate-700 shadow-sm focus:ring-blue-500 focus:border-blue-500 p-3 bg-slate-50 dark:bg-slate-900 dark:text-white transition-colors" onchange="handleFileSelect(event)">
+                        <p class="text-xs text-slate-500 mt-2">Pastikan format kolom sesuai dengan template atau hasil Export.</p>
+                    </div>
+
+                    <div id="preview-section" class="hidden">
+                        <h4 class="font-bold text-slate-700 dark:text-slate-300 mb-2">Preview Hasil Import</h4>
+                        <div class="grid grid-cols-3 gap-3 mb-3">
+                            <div class="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
+                                <span class="block text-xl font-bold text-green-600" id="prev-new">0</span>
+                                <span class="text-xs text-green-700">Data Baru</span>
+                            </div>
+                            <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 text-center">
+                                <span class="block text-xl font-bold text-blue-600" id="prev-update">0</span>
+                                <span class="text-xs text-blue-700">Diperbarui</span>
+                            </div>
+                            <div class="bg-red-50 border border-red-200 rounded-lg p-3 text-center">
+                                <span class="block text-xl font-bold text-red-600" id="prev-fail">0</span>
+                                <span class="text-xs text-red-700">Gagal</span>
+                            </div>
+                        </div>
+                        <div id="preview-errors" class="text-xs text-red-500 max-h-24 overflow-y-auto hidden bg-red-50 p-2 rounded"></div>
+                    </div>
+
+                    <div class="pt-4 flex justify-end gap-3 border-t border-slate-100 dark:border-slate-700 mt-4">
+                        <button type="button" onclick="closeImportModal()" class="px-5 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 font-bold hover:bg-slate-100 dark:hover:bg-slate-700 transition">Batal</button>
+                        <button type="button" id="btn-process-import" onclick="processImport()" disabled class="px-6 py-2.5 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 shadow-md transition transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed">Proses Import</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
+    <!-- SheetJS for Excel Reading/Writing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script>
+        let excelDataToImport = null;
+
+        function closeImportModal() {
+            document.getElementById('modal-import').classList.add('hidden');
+            document.getElementById('file-upload').value = '';
+            document.getElementById('preview-section').classList.add('hidden');
+            document.getElementById('btn-process-import').disabled = true;
+            excelDataToImport = null;
+        }
+
+        async function exportExcel() {
+            Swal.fire({
+                title: 'Mempersiapkan Export...',
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading()
+            });
+
+            try {
+                const response = await fetch('{{ route('balita.export_data') }}');
+                const data = await response.json();
+                
+                if (data.length === 0) {
+                    Swal.fire('Informasi', 'Data Balita kosong.', 'info');
+                    return;
+                }
+
+                // Buat worksheet SheetJS dari JSON
+                const ws = XLSX.utils.json_to_sheet(data);
+                
+                // Buat workbook dan tambahkan worksheet
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "Data Balita");
+
+                // Download Excel
+                XLSX.writeFile(wb, "Data_Balita_Posyandu.xlsx");
+
+                Swal.close();
+            } catch (error) {
+                console.error(error);
+                Swal.fire('Error', 'Gagal mengekspor data', 'error');
+            }
+        }
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, {type: 'array', cellDates: true});
+                
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+                
+                // Konversi sheet ke object array format Date pakai string
+                const json = XLSX.utils.sheet_to_json(worksheet, { raw: false, dateNF: 'yyyy-mm-dd' });
+
+                if (json.length === 0) {
+                    Swal.fire('Peringatan', 'File Excel kosong atau tidak terbaca.', 'warning');
+                    return;
+                }
+
+                excelDataToImport = json;
+                previewImport(json);
+            };
+
+            reader.readAsArrayBuffer(file);
+        }
+
+        async function previewImport(jsonData) {
+            Swal.fire({
+                title: 'Membaca Data...',
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading()
+            });
+
+            try {
+                const res = await fetch('{{ route('balita.import_preview') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ data: jsonData })
+                });
+
+                const result = await res.json();
+                
+                if (res.ok) {
+                    document.getElementById('prev-new').innerText = result.new;
+                    document.getElementById('prev-update').innerText = result.update;
+                    document.getElementById('prev-fail').innerText = result.failed;
+                    
+                    const errorsDiv = document.getElementById('preview-errors');
+                    if (result.errors && result.errors.length > 0) {
+                        errorsDiv.innerHTML = result.errors.join('<br>');
+                        errorsDiv.classList.remove('hidden');
+                    } else {
+                        errorsDiv.classList.add('hidden');
+                    }
+
+                    document.getElementById('preview-section').classList.remove('hidden');
+                    
+                    if (result.new > 0 || result.update > 0) {
+                        document.getElementById('btn-process-import').disabled = false;
+                    }
+
+                    Swal.close();
+                } else {
+                    Swal.fire('Error', result.error || 'Terjadi kesalahan sistem', 'error');
+                }
+            } catch (error) {
+                console.error(error);
+                Swal.fire('Error', 'Gagal memproses file', 'error');
+            }
+        }
+
+        async function processImport() {
+            if (!excelDataToImport) return;
+
+            document.getElementById('btn-process-import').disabled = true;
+            document.getElementById('btn-process-import').innerText = 'Memproses...';
+
+            try {
+                const res = await fetch('{{ route('balita.import_process') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ data: excelDataToImport })
+                });
+
+                const result = await res.json();
+
+                if (res.ok) {
+                    closeImportModal();
+                    Swal.fire('Berhasil', 'Data balita berhasil diimport!', 'success').then(() => {
+                        window.location.reload();
+                    });
+                } else {
+                    Swal.fire('Error', result.error || 'Gagal menyimpan data ke database', 'error');
+                    document.getElementById('btn-process-import').disabled = false;
+                    document.getElementById('btn-process-import').innerText = 'Proses Import';
+                }
+            } catch (error) {
+                console.error(error);
+                Swal.fire('Error', 'Terjadi kesalahan jaringan', 'error');
+                document.getElementById('btn-process-import').disabled = false;
+                document.getElementById('btn-process-import').innerText = 'Proses Import';
+            }
+        }
+    </script>
 </x-app-layout>
