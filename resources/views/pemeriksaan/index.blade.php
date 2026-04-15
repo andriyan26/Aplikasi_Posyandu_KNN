@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        DATA PEMERIKSAAN BALITA
+        PEMERIKSAAN
     </x-slot>
 
     <div class="bg-white dark:bg-slate-800 rounded-[24px] shadow-sm border border-slate-100 dark:border-slate-700/50 overflow-hidden relative z-20 mb-10 transition-colors duration-300">
@@ -14,19 +14,10 @@
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center p-6 border-b border-slate-100 dark:border-slate-700/50 bg-slate-50/30 dark:bg-slate-800/50 gap-4">
             <div>
                 <h3 class="text-xl font-bold text-slate-700 dark:text-white">Riwayat Pemeriksaan</h3>
-                <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Total: <b>{{ $pemeriksaans->total() }}</b> Pemeriksaan tercatat</p>
             </div>
             <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
                 <form action="{{ route('pemeriksaan.index') }}" method="GET" class="flex flex-wrap items-center gap-3 w-full md:w-auto">
-                    <div class="flex items-center gap-2">
-                        <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Show</label>
-                        <select name="per_page" onchange="this.form.submit()" class="rounded-xl border-slate-200 dark:border-slate-700 text-sm focus:ring-blue-500 focus:border-blue-500 py-2 pl-3 pr-8 bg-white dark:bg-slate-900 dark:text-slate-300 shadow-sm transition-colors">
-                            <option value="5" {{ request('per_page') == 5 ? 'selected' : '' }}>5</option>
-                            <option value="10" {{ request('per_page') == 10 ? 'selected' : '' }}>10</option>
-                            <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
-                            <option value="all" {{ request('per_page') == 'all' ? 'selected' : '' }}>Semua</option>
-                        </select>
-                    </div>
+
 
                     <div class="relative flex-1 md:w-64">
                         <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama balita..." class="w-full rounded-xl border-slate-200 dark:border-slate-700 text-sm focus:ring-blue-500 focus:border-blue-500 py-2 pl-4 pr-10 bg-white dark:bg-slate-900 dark:text-slate-300 shadow-sm transition-colors">
@@ -116,10 +107,30 @@
                 </tbody>
             </table>
             
-            <div class="mt-6">
-                @if(method_exists($pemeriksaans, 'links'))
-                    {{ $pemeriksaans->links() }}
-                @endif
+            <div class="mt-6 flex flex-col md:flex-row justify-between items-center gap-4 bg-slate-50/50 dark:bg-slate-900/30 p-4 rounded-xl border border-slate-100 dark:border-slate-700/50">
+                <div class="flex items-center gap-4 order-2 md:order-1">
+                    <form action="{{ route('pemeriksaan.index') }}" method="GET" class="flex items-center gap-2">
+                        @if(request('search'))
+                            <input type="hidden" name="search" value="{{ request('search') }}">
+                        @endif
+                        <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Show</label>
+                        <select name="per_page" onchange="this.form.submit()" class="rounded-xl border-slate-200 dark:border-slate-700 text-sm focus:ring-blue-500 focus:border-blue-500 py-1.5 pl-3 pr-8 bg-white dark:bg-slate-900 dark:text-slate-300 shadow-sm transition-colors">
+                            <option value="5" {{ request('per_page') == 5 ? 'selected' : '' }}>5</option>
+                            <option value="10" {{ request('per_page') == 10 ? 'selected' : '' }}>10</option>
+                            <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
+                            <option value="all" {{ request('per_page') == 'all' ? 'selected' : '' }}>Semua</option>
+                        </select>
+                    </form>
+                    <p class="text-xs font-medium text-slate-500 dark:text-slate-400 mt-0.5">
+                        Menampilkan <span class="font-bold text-slate-700 dark:text-slate-200">{{ $pemeriksaans->firstItem() ?? 0 }}</span> s/d <span class="font-bold text-slate-700 dark:text-slate-200">{{ $pemeriksaans->lastItem() ?? 0 }}</span> dari <span class="font-bold text-slate-700 dark:text-slate-200">{{ $pemeriksaans->total() }}</span> Data
+                    </p>
+                </div>
+                
+                <div class="order-1 md:order-2">
+                    @if(method_exists($pemeriksaans, 'links'))
+                        {{ $pemeriksaans->links() }}
+                    @endif
+                </div>
             </div>
         </div>
     </div>

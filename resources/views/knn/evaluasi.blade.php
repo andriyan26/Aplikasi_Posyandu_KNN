@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        DATA TRAINING & EVALUASI MODEL KNN
+        DATA TRAINING
     </x-slot>
 
     <div class="w-full max-w-7xl mx-auto pb-12 px-4 sm:px-6">
