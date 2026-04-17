@@ -7,7 +7,7 @@
         <p class="text-teal-100 text-sm font-medium">Silakan masuk untuk melanjutkan</p>
     </div>
 
-    <form method="POST" action="{{ route('login') }}" class="space-y-6">
+    <form method="POST" action="{{ route('login') }}" class="space-y-6" novalidate>
         @csrf
 
         <!-- Email Address -->
