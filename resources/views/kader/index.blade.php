@@ -65,11 +65,11 @@
                         </td>
                         <td class="px-6 py-5 text-center">
                             @if($kader->barcode_ttd)
-                                <div class="inline-block p-2 bg-white border rounded-xl shadow-sm">
-                                    <div class="flex justify-center">
-                                        {!! \SimpleSoftwareIO\QrCode\Facades\QrCode::size(50)->margin(0)->generate($kader->barcode_ttd) !!}
+                                <div class="inline-block p-1 bg-white border border-slate-200 rounded-xl shadow-sm text-center">
+                                    <div class="flex justify-center mb-1">
+                                        <img src="{{ asset('assets/Barcode TTD/' . $kader->barcode_ttd) }}" class="h-10 object-contain" alt="Barcode TTD">
                                     </div>
-                                    <div class="text-[10px] text-slate-500 mt-2 tracking-widest text-center font-mono">{{ $kader->barcode_ttd }}</div>
+                                    <div class="text-[9px] text-slate-400 mt-1 tracking-wider text-center font-mono truncate max-w-[100px] mx-auto">{{ $kader->barcode_ttd }}</div>
                                 </div>
                             @else
                                 <span class="text-xs text-slate-400">Belum ada</span>

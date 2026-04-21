@@ -236,9 +236,17 @@
             <div style="height: 80px; margin-top: 10px; text-align: center;">
                 @if($pemeriksaan->kader && $pemeriksaan->kader->barcode_ttd)
                     @php
-                        $qrCode = base64_encode(\SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->margin(0)->size(80)->generate($pemeriksaan->kader->barcode_ttd));
+                        $ttdPath = public_path('assets/Barcode TTD/' . $pemeriksaan->kader->barcode_ttd);
+                        $ttdBase64 = '';
+                        if (file_exists($ttdPath)) {
+                            $ttdBase64 = 'data:image/png;base64,' . base64_encode(file_get_contents($ttdPath));
+                        }
                     @endphp
-                    <img src="data:image/svg+xml;base64,{{ $qrCode }}" width="80" height="80" alt="QR Code TTD" style="display:inline-block;">
+                    @if($ttdBase64)
+                        <img src="{{ $ttdBase64 }}" height="70" alt="Barcode TTD" style="display:inline-block; max-width: 150px;">
+                    @else
+                        <span style="color:#aaa; font-size:10px;">(Tanda Tangan Belum Diatur)</span>
+                    @endif
                 @endif
             </div>
 
