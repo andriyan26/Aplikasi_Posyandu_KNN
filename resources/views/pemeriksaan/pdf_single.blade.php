@@ -150,14 +150,9 @@
     <div class="section-title">A. Identitas Balita</div>
     <table class="info-table">
         <tr>
-            <td>Nomor Induk Kependudukan (NIK)</td>
+            <td>Kode Balita</td>
             <td>:</td>
-            <td>{{ $pemeriksaan->balita->nik ?? '-' }}</td>
-        </tr>
-        <tr>
-            <td>Kode / ID Balita</td>
-            <td>:</td>
-            <td>{{ $pemeriksaan->balita->kode ?? '-' }}</td>
+            <td>{{ $pemeriksaan->balita->kode_balita ?? '-' }}</td>
         </tr>
         <tr>
             <td>Nama Balita</td>
@@ -236,9 +231,21 @@
     <!-- Tanda Tangan -->
     <div class="footer">
         <div class="signature-box">
-            <div class="signature-date">Posyandu Belimbing, {{ date('d F Y') }}</div>
-            <div style="height: 60px;"></div> <!-- Ruang tanda tangan -->
-            <div class="signature-line">Petugas Pemeriksa / Kader</div>
+            <div class="signature-date">Posyandu Belimbing, {{ \Carbon\Carbon::parse($pemeriksaan->tanggal_pemeriksaan)->translatedFormat('d F Y') }}</div>
+            
+            <div style="height: 80px; margin-top: 10px; text-align: center;">
+                @if($pemeriksaan->kader && $pemeriksaan->kader->barcode_ttd)
+                    @php
+                        $qrCode = base64_encode(\SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->margin(0)->size(80)->generate($pemeriksaan->kader->barcode_ttd));
+                    @endphp
+                    <img src="data:image/svg+xml;base64,{{ $qrCode }}" width="80" height="80" alt="QR Code TTD" style="display:inline-block;">
+                @endif
+            </div>
+
+            <div class="signature-line" style="margin-top: 10px; text-transform: uppercase;">
+                {{ $pemeriksaan->kader->nama ?? 'Petugas Kader' }}
+            </div>
+            <div style="font-size: 10px; color: #64748b; margin-top: 5px;">ID Kader: {{ $pemeriksaan->kader->id_kader ?? '-' }}</div>
         </div>
         <div class="clear"></div>
     </div>

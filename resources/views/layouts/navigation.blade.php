@@ -59,10 +59,10 @@
             <div class="w-full h-px bg-slate-100 dark:bg-slate-800 my-4"></div> <!-- Divider -->
 
             <!-- MASTER DATA DROPDOWN -->
-            <div x-data="{ open: {{ request()->routeIs('balita.*') || request()->routeIs('users.*') ? 'true' : 'false' }} }"
+            <div x-data="{ open: {{ request()->routeIs('balita.*') || request()->routeIs('users.*') || request()->routeIs('kader.*') ? 'true' : 'false' }} }"
                 class="w-full">
                 <button @click="open = !open" type="button"
-                    class="flex w-full items-center justify-between px-4 py-3.5 rounded-2xl transition duration-200 font-bold text-sm tracking-wide group {{ request()->routeIs('balita.*') || request()->routeIs('users.*') ? 'bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50' }}">
+                    class="flex w-full items-center justify-between px-4 py-3.5 rounded-2xl transition duration-200 font-bold text-sm tracking-wide group {{ request()->routeIs('balita.*') || request()->routeIs('users.*') || request()->routeIs('kader.*') ? 'bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50' }}">
                     <div class="flex items-center whitespace-nowrap">
                         <svg class="h-5 w-5 mr-3 shrink-0 text-emerald-500 dark:text-emerald-400" fill="none"
                             viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
@@ -81,7 +81,7 @@
                 </button>
                 <div x-show="open" x-transition.opacity
                     class="pl-4 pr-1 mt-1 space-y-1 border-l-2 border-slate-100 dark:border-slate-800 ml-6"
-                    @if(request()->routeIs('balita.*') || request()->routeIs('users.*')) style="display: block;" @else style="display: none;" @endif>
+                    @if(request()->routeIs('balita.*') || request()->routeIs('users.*') || request()->routeIs('kader.*')) style="display: block;" @else style="display: none;" @endif>
 
                     @if(Auth::user()->role === 'admin')
                         <a href="{{ route('users.index') }}"
@@ -94,6 +94,17 @@
                             </svg>
                             DATA AKUN
                         </a>
+
+                    <a href="{{ route('kader.index') }}"
+                        class="flex items-center px-4 py-3 rounded-xl transition duration-200 font-bold text-xs tracking-wide group {{ request()->routeIs('kader.*') ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-700' }}">
+                        <svg class="h-5 w-5 shrink-0 mr-3 {{ request()->routeIs('kader.*') ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400 dark:text-slate-500 group-hover:text-blue-500' }}"
+                            fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z">
+                            </path>
+                        </svg>
+                        DATA KADER
+                    </a>
                     @endif
 
                     <a href="{{ route('balita.index') }}"

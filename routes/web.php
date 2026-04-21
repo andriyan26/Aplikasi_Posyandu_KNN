@@ -7,6 +7,7 @@ use App\Http\Controllers\PemeriksaanController;
 use App\Http\Controllers\KnnController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ImportController;
+use App\Http\Controllers\KaderController;
 use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Route;
 
@@ -50,6 +51,7 @@ Route::middleware('auth')->group(function () {
     // Admin Only Actions (User Management)
     Route::middleware('role:admin')->group(function () {
         Route::resource('users', UserController::class)->except(['show', 'create', 'edit']);
+        Route::resource('kader', KaderController::class);
     });
 });
 

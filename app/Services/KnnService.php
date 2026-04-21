@@ -5,6 +5,30 @@ namespace App\Services;
 class KnnService
 {
     /**
+     * Cari nilai Min dan Max untuk setiap fitur dari Dataset
+     */
+    public function getMinMax(array $trainData): array
+    {
+        $minMax = [];
+        if (empty($trainData)) return $minMax;
+
+        $numFeatures = count($trainData[0]['features'] ?? []);
+        
+        for ($i = 0; $i < $numFeatures; $i++) {
+            $minMax[$i] = ['min' => PHP_FLOAT_MAX, 'max' => -PHP_FLOAT_MAX];
+        }
+
+        foreach ($trainData as $item) {
+            foreach ($item['features'] as $index => $val) {
+                if ($val < $minMax[$index]['min']) $minMax[$index]['min'] = $val;
+                if ($val > $minMax[$index]['max']) $minMax[$index]['max'] = $val;
+            }
+        }
+        
+        return $minMax;
+    }
+
+    /**
      * Hitung Jarak Euclidean 
      */
     public function euclideanDistance(array $point1, array $point2): float
@@ -18,15 +42,35 @@ class KnnService
     }
 
     /**
-     * Prediksi label berdasar k-tetangga terdekat
-     * $trainData = [['features' => [weight, height, lila], 'label' => 'Rendah']]
+     * Prediksi label berdasar k-tetangga terdekat dengan normalisasi (Otomatis jika fitur > 1)
      */
     public function predict(array $trainData, array $testFeatures, int $k = 3): string
     {
+        // 1. Dapatkan batas Min-Max dari data latih
+        $minMax = $this->getMinMax($trainData);
+        
+        // 2. Normalisasi fitur testing
+        $testNormalized = [];
+        foreach ($testFeatures as $index => $val) {
+            $min = $minMax[$index]['min'] ?? 0;
+            $max = $minMax[$index]['max'] ?? 0;
+            $testNormalized[$index] = ($max == $min) ? 0 : ($val - $min) / ($max - $min);
+        }
+
         $distances = [];
 
         foreach ($trainData as $trainItem) {
-            $distance = $this->euclideanDistance($testFeatures, $trainItem['features']);
+            // 3. Normalisasi fitur data latih terkait
+            $trainNormalized = [];
+            foreach ($trainItem['features'] as $index => $val) {
+                $min = $minMax[$index]['min'] ?? 0;
+                $max = $minMax[$index]['max'] ?? 0;
+                $trainNormalized[$index] = ($max == $min) ? 0 : ($val - $min) / ($max - $min);
+            }
+
+            // 4. Hitung Jarak Euclidean setelah terskala [0, 1]
+            $distance = $this->euclideanDistance($testNormalized, $trainNormalized);
+            
             $distances[] = [
                 'distance' => $distance,
                 'label' => $trainItem['label']
@@ -80,6 +124,55 @@ class KnnService
         $predictions = [];
         $classes = ['Rendah', 'Sedang', 'Tinggi'];
         
+        // Agar komputasi Evaluasi tidak me-recompute min-max berulang kali, kita normalisasi total di sini.
+        // Walaupun predict() punya min-max otomatis, memanggil predict() ribuan kali akan memperlambat evaluasi.
+        // Oleh karena itu, kita akan mem-bypass predict normal untuk scaling bulk:
+
+        $minMax = $this->getMinMax($trainData);
+
+        $normalize = function($features) use ($minMax) {
+            $norm = [];
+            foreach ($features as $index => $val) {
+                $min = $minMax[$index]['min'] ?? 0;
+                $max = $minMax[$index]['max'] ?? 0;
+                $norm[$index] = ($max == $min) ? 0 : ($val - $min) / ($max - $min);
+            }
+            return $norm;
+        };
+
+        $normalizedTrainData = array_map(function($item) use ($normalize) {
+            return [
+                'features' => $normalize($item['features']),
+                'label' => $item['label']
+            ];
+        }, $trainData);
+
+        $normalizedTestData = array_map(function($item) use ($normalize) {
+            return [
+                'features' => $normalize($item['features']),
+                'label' => $item['label']
+            ];
+        }, $testData);
+
+        // Define inline scaled-predict closure for speed
+        $scaledPredict = function($trainNorm, $testFeaturesNorm, $k) {
+            $distances = [];
+            foreach ($trainNorm as $trainItem) {
+                $distances[] = [
+                    'distance' => $this->euclideanDistance($testFeaturesNorm, $trainItem['features']),
+                    'label' => $trainItem['label']
+                ];
+            }
+            usort($distances, fn($a, $b) => $a['distance'] <=> $b['distance']);
+            $topK = array_slice($distances, 0, $k);
+            $counts = [];
+            foreach ($topK as $it) {
+                $counts[$it['label']] = ($counts[$it['label']] ?? 0) + 1;
+            }
+            arsort($counts);
+            return array_key_first($counts) ?? 'Rendah';
+        };
+        
         // Initialize Confusion Matrix
         $matrix = [];
         foreach ($classes as $actual) {
@@ -88,8 +181,8 @@ class KnnService
             }
         }
 
-        foreach ($testData as $testItem) {
-            $prediction = $this->predict($trainData, $testItem['features'], $k);
+        foreach ($normalizedTestData as $testItem) {
+            $prediction = $scaledPredict($normalizedTrainData, $testItem['features'], $k);
             $actual = $testItem['label'];
             
             if ($prediction === $actual) {

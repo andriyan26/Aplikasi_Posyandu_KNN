@@ -41,13 +41,13 @@
                     <div class="grid grid-cols-1 md:grid-cols-12 gap-5">
                         <div class="md:col-span-6">
                             <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Pilih Balita (Cari Kode/Nama/Ortu)</label>
-                            <select name="balita_id" id="balita_select" required class="w-full rounded-xl text-sm border-slate-300 dark:border-slate-700 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-3.5 bg-slate-50 dark:bg-slate-900 dark:text-white transition-colors">
+                            <select name="kode_balita" id="balita_select" required class="w-full rounded-xl text-sm border-slate-300 dark:border-slate-700 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-3.5 bg-slate-50 dark:bg-slate-900 dark:text-white transition-colors">
                                 <option value="" disabled selected>-- Cari Kode, Nama, atau Orang Tua --</option>
                                 @foreach($balitas as $b)
-                                    <option value="{{ $b->id }}" data-tanggal-lahir="{{ $b->tanggal_lahir }}">[{{ $b->kode ?? 'Belum ada Kode' }}] {{ $b->nama }} (Ortu: {{ $b->nama_orang_tua }})</option>
+                                    <option value="{{ $b->kode_balita }}" data-tanggal-lahir="{{ $b->tanggal_lahir }}">[{{ $b->kode_balita }}] {{ $b->nama }} (Ortu: {{ $b->nama_orang_tua }})</option>
                                 @endforeach
                             </select>
-                            @error('balita_id') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
+                            @error('kode_balita') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
                         </div>
  
                         <div class="md:col-span-3">
@@ -61,6 +61,28 @@
                             <div class="relative">
                                 <input type="text" id="usia_tampil" readonly placeholder="- Tahun" class="w-full rounded-xl text-sm border-slate-200 dark:border-slate-700 shadow-sm p-3.5 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 cursor-not-allowed font-black transition-colors focus:ring-0">
                             </div>
+                        </div>
+
+                        <div class="col-span-full">
+                            <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Kader Pemeriksa (Tanda Tangan)</label>
+                            @if(auth()->user()->role === 'kader' && isset($kader_login))
+                                <input type="hidden" name="id_kader" value="{{ $kader_login->id_kader }}">
+                                <div class="w-full rounded-xl text-sm border-indigo-200 shadow-sm p-3.5 bg-indigo-50 text-indigo-700 font-bold border flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <svg class="h-5 w-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                                        <span>Memeriksa sebagai: {{ $kader_login->nama }}</span>
+                                    </div>
+                                    <svg class="h-5 w-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                </div>
+                            @else
+                                <select name="id_kader" required class="w-full rounded-xl text-sm border-slate-300 dark:border-slate-700 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-3.5 bg-slate-50 dark:bg-slate-900 dark:text-white transition-colors">
+                                    <option value="" disabled selected>-- Pilih Kader yang Bertugas --</option>
+                                    @foreach($kaders as $kader)
+                                        <option value="{{ $kader->id_kader }}">{{ $kader->nama }}</option>
+                                    @endforeach
+                                </select>
+                            @endif
+                            @error('id_kader') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
                         </div>
                     </div>
                 </div>

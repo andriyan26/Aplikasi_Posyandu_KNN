@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\DataLatih;
 use App\Models\Pemeriksaan;
 use App\Models\Balita;
+use App\Models\Kader;
 use Illuminate\Http\Request;
 use App\Services\KnnService;
 
@@ -22,7 +23,7 @@ class PemeriksaanController extends Controller
         $search = $request->get('search');
         $per_page = $request->get('per_page', 5);
 
-        $query = Pemeriksaan::with('balita')->latest();
+        $query = Pemeriksaan::with(['balita', 'kader'])->latest();
 
         if ($search) {
             $query->whereHas('balita', function($q) use ($search) {
@@ -43,14 +44,22 @@ class PemeriksaanController extends Controller
 
     public function create()
     {
-        $balitas = Balita::all();
-        return view('pemeriksaan.create', compact('balitas'));
+        $balitas = Balita::where('status_balita', 'Masih Aktif')->get();
+        $kaders = Kader::where('status_aktif', 'Aktif')->get();
+        
+        $kader_login = null;
+        if(auth()->user()->role === 'kader') {
+            $kader_login = Kader::whereRaw('LOWER(nama) = ?', [strtolower(auth()->user()->name)])->first();
+        }
+
+        return view('pemeriksaan.create', compact('balitas', 'kaders', 'kader_login'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'balita_id' => 'required|exists:balita,id',
+            'kode_balita' => 'required|exists:balita,kode_balita',
+            'id_kader' => 'required|exists:kader,id_kader',
             'tanggal_pemeriksaan' => 'required|date',
             'berat_badan' => 'required|numeric',
             'tinggi_badan' => 'required|numeric',
@@ -58,7 +67,7 @@ class PemeriksaanController extends Controller
             'lingkar_kepala' => 'required|numeric',
         ]);
 
-        $balita = Balita::findOrFail($request->balita_id);
+        $balita = Balita::where('kode_balita', $request->kode_balita)->firstOrFail();
         
         // Usia dalam tahun format desimal (contoh: 2.1)
         $tglLahir = \Carbon\Carbon::parse($balita->tanggal_lahir);
@@ -109,7 +118,8 @@ class PemeriksaanController extends Controller
         }
 
         Pemeriksaan::create([
-            'balita_id' => $request->balita_id,
+            'kode_balita' => $request->kode_balita,
+            'id_kader' => $request->id_kader,
             'usia_saat_periksa' => $usia_desimal,
             'tanggal_pemeriksaan' => $request->tanggal_pemeriksaan,
             'berat_badan' => $request->berat_badan,
@@ -124,13 +134,13 @@ class PemeriksaanController extends Controller
 
     public function show(Pemeriksaan $pemeriksaan)
     {
-        $pemeriksaan->load('balita'); // pastikan relasi balita ditarik
+        $pemeriksaan->load('balita', 'kader'); 
         return view('pemeriksaan.show', compact('pemeriksaan'));
     }
 
     public function pdfSingle(Pemeriksaan $pemeriksaan)
     {
-        $pemeriksaan->load('balita');
+        $pemeriksaan->load('balita', 'kader');
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pemeriksaan.pdf_single', compact('pemeriksaan'));
         
         $fileName = 'Pemeriksaan_' . ($pemeriksaan->balita->nama ?? 'Balita') . '_' . \Carbon\Carbon::parse($pemeriksaan->tanggal_pemeriksaan)->format('d-m-Y') . '.pdf';

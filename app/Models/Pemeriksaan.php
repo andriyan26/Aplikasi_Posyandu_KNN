@@ -10,7 +10,8 @@ class Pemeriksaan extends Model
     protected $table = 'pemeriksaan';
 
     protected $fillable = [
-        'balita_id',
+        'kode_balita',
+        'id_kader',
         'usia_saat_periksa',
         'tanggal_pemeriksaan',
         'berat_badan',
@@ -22,6 +23,11 @@ class Pemeriksaan extends Model
 
     public function balita()
     {
-        return $this->belongsTo(Balita::class);
+        return $this->belongsTo(Balita::class, 'kode_balita', 'kode_balita');
+    }
+
+    public function kader()
+    {
+        return $this->belongsTo(Kader::class, 'id_kader', 'id_kader');
     }
 }

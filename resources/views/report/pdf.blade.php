@@ -18,8 +18,8 @@
 <body>
 
     <div class="header">
-        @if($balita_id)
-            @php $namaAnak = \App\Models\Balita::find($balita_id)->nama ?? 'Anak'; @endphp
+        @if($kode_balita)
+            @php $namaAnak = \App\Models\Balita::where('kode_balita', $kode_balita)->first()->nama ?? 'Anak'; @endphp
             <h1>LAPORAN PERKEMBANGAN BALITA: {{ strtoupper($namaAnak) }}</h1>
             <p>Periode: {{ $namaBulan }} - {{ $namaBulanAkhir }} Tahun {{ $tahun }}</p>
         @else
@@ -32,7 +32,7 @@
         <thead>
             <tr>
                 <th class="text-center" width="5%">No</th>
-                @if($balita_id)
+                @if($kode_balita)
                     <th width="20%">Tanggal Periksa</th>
                     <th class="text-center" width="15%">Usia (Bulan)</th>
                 @else
@@ -45,7 +45,7 @@
             </tr>
         </thead>
         <tbody>
-            @if($balita_id)
+            @if($kode_balita)
                 @forelse($pemeriksaans as $p)
                 <tr>
                     <td class="text-center">{{ $loop->iteration }}</td>

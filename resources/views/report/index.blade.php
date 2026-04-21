@@ -3,6 +3,9 @@
         REPORT DATA POSYANDU
     </x-slot>
 
+    <!-- Include Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
     <div class="max-w-7xl mx-auto pb-12 px-4 sm:px-6 relative z-20">
         
         <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700/50 p-6 mb-10">
@@ -12,11 +15,11 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
                     <!-- Balita -->
                     <div>
-                         <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Pilih Balita</label>
-                         <select name="balita_id" id="balita_id" class="w-full rounded-xl text-sm border-slate-300 dark:border-slate-700 shadow-sm focus:ring-blue-500 focus:border-blue-500 p-3.5 bg-slate-50 dark:bg-slate-900 dark:text-white transition cursor-pointer" onchange="toggleBulanAkhir()">
-                             <option value="">Semua Balita (Laporan Bulanan)</option>
+                         <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Pilih Balita (Cari Nama/Kode)</label>
+                         <select name="kode_balita" id="kode_balita" class="w-full rounded-xl text-sm border-slate-300 dark:border-slate-700 shadow-sm focus:ring-blue-500 focus:border-blue-500 p-3.5 bg-slate-50 dark:bg-slate-900 dark:text-white transition cursor-pointer" onchange="toggleBulanAkhir()">
+                             <option value="">-- Semua Balita / Laporan Bulanan --</option>
                              @foreach($semua_balita as $b)
-                                 <option value="{{ $b->id }}" {{ request('balita_id') == $b->id ? 'selected' : '' }}>{{ $b->nama }}</option>
+                                 <option value="{{ $b->kode_balita }}" {{ request('kode_balita') == $b->kode_balita ? 'selected' : '' }}>[{{ $b->kode_balita }}] {{ $b->nama }}</option>
                              @endforeach
                          </select>
                     </div>
@@ -44,7 +47,7 @@
                     </div>
                     
                     <!-- Bulan Akhir -->
-                    <div id="wrapper-bulan-akhir" class="{{ request('balita_id') ? '' : 'hidden' }}">
+                    <div id="wrapper-bulan-akhir" class="{{ request('kode_balita') ? '' : 'hidden' }}">
                         <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Sampai Bulan</label>
                         <select name="bulan_akhir" id="bulan_akhir" class="w-full rounded-xl text-sm border-slate-300 dark:border-slate-700 shadow-sm focus:ring-blue-500 focus:border-blue-500 p-3.5 bg-slate-50 dark:bg-slate-900 dark:text-white transition cursor-pointer">
                             @foreach(range(1, 12) as $m)
@@ -57,13 +60,13 @@
                 </div>
 
                 <div class="flex flex-col sm:flex-row items-center sm:justify-end gap-3 w-full border-t border-slate-100 dark:border-slate-700 pt-5 mt-2">
-                    <button type="submit" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 px-8 rounded-xl flex items-center justify-center gap-2 transition hover:-translate-y-0.5 hover:shadow-lg shadow-sm">
+                    <button type="submit" id="btn-terapkan" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 px-8 rounded-xl flex items-center justify-center gap-2 transition hover:-translate-y-0.5 hover:shadow-lg shadow-sm">
                         <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                         Terapkan Filter
                     </button>
-                    <a href="{{ route('report.pdf', request()->all()) }}" target="_blank" class="w-full sm:w-auto bg-red-500 hover:bg-red-600 text-white font-bold py-3.5 px-8 rounded-xl flex items-center justify-center gap-2 transition hover:-translate-y-0.5 hover:shadow-lg shadow-sm shadow-red-200 dark:shadow-none">
+                    <a href="{{ route('report.pdf', request()->all()) }}" target="_blank" id="btn-download-pdf" class="w-full sm:w-auto bg-red-500 hover:bg-red-600 text-white font-bold py-3.5 px-8 rounded-xl flex items-center justify-center gap-2 transition hover:-translate-y-0.5 hover:shadow-lg shadow-sm shadow-red-200 dark:shadow-none">
                         <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                        Download Laporan PDF
+                        <span>Download Laporan PDF</span>
                     </a>
                 </div>
             </form>
@@ -73,8 +76,8 @@
         <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700/50 overflow-hidden">
             <div class="p-6 border-b border-slate-100 dark:border-slate-700/50">
                 <h3 class="text-xl font-bold text-slate-700 dark:text-white">
-                    @if($balita_id)
-                        Laporan Perkembangan: <span class="text-blue-600 dark:text-blue-400">{{ $semua_balita->firstWhere('id', $balita_id)->nama ?? '' }}</span>
+                    @if($kode_balita)
+                        Laporan Perkembangan: <span class="text-blue-600 dark:text-blue-400">{{ $semua_balita->firstWhere('kode_balita', $kode_balita)->nama ?? '' }}</span>
                         <span class="block text-sm font-normal text-slate-500 mt-1">Periode: {{ \Carbon\Carbon::createFromFormat('m', $bulan)->translatedFormat('F') }} - {{ \Carbon\Carbon::createFromFormat('m', $bulan_akhir)->translatedFormat('F') }} {{ $tahun }}</span>
                     @else
                         Laporan Bulanan: <span class="text-blue-600 dark:text-blue-400">{{ \Carbon\Carbon::createFromFormat('m', $bulan)->translatedFormat('F') }} {{ $tahun }}</span>
@@ -87,7 +90,7 @@
                     <thead>
                         <tr class="text-slate-500 dark:text-slate-400 text-[10px] uppercase font-black tracking-widest bg-slate-50/80 dark:bg-slate-900/50">
                             <th class="px-6 py-5 text-center rounded-tl-2xl w-16">No</th>
-                            @if($balita_id)
+                            @if($kode_balita)
                                 <th class="px-6 py-5">Tanggal Periksa</th>
                                 <th class="px-6 py-5 text-center">Usia Periksa</th>
                             @else
@@ -100,7 +103,7 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100 dark:divide-slate-700/50">
-                        @if($balita_id)
+                        @if($kode_balita)
                             {{-- Mode Laporan Anak --}}
                             @forelse($pemeriksaans as $p)
                                 <tr class="hover:bg-blue-50/30 dark:hover:bg-slate-800/50 transition border-b border-slate-50 dark:border-slate-700/50">
@@ -167,9 +170,11 @@
             </div>
         </div>
 
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
         <script>
             function toggleBulanAkhir() {
-                var balitaSelect = document.getElementById('balita_id');
+                var balitaSelect = document.getElementById('kode_balita');
                 var wrapperAkhir = document.getElementById('wrapper-bulan-akhir');
                 var labelBulan = document.getElementById('label-bulan');
                 
@@ -184,6 +189,44 @@
             
             // Initial call to set correct state
             document.addEventListener("DOMContentLoaded", toggleBulanAkhir);
+
+            $(document).ready(function() {
+                // Inisialisasi Select2 untuk Pencarian Balita
+                $('#kode_balita').select2({
+                    placeholder: "-- Semua Balita / Laporan Bulanan --",
+                    allowClear: true,
+                    width: '100%'
+                });
+
+                // Perbarui toggle saat Select2 berubah
+                $('#kode_balita').on('change', function() {
+                    toggleBulanAkhir();
+                });
+
+                // Logika mematikan tombol Download sebelum Terapkan Filter
+                const originalHref = $('#btn-download-pdf').attr('href');
+                let isModified = false;
+
+                function disableDownload() {
+                    if(!isModified) {
+                        isModified = true;
+                        $('#btn-download-pdf')
+                            .attr('href', 'javascript:void(0)')
+                            .removeAttr('target')
+                            .addClass('opacity-50 cursor-not-allowed pointer-events-none bg-slate-400')
+                            .removeClass('bg-red-500 hover:bg-red-600 hover:-translate-y-0.5 hover:shadow-lg shadow-red-200');
+                        
+                        $('#btn-download-pdf span').text('Harap Terapkan Filter');
+                        
+                        // Buat tombol Terapkan lebih menonjol
+                        $('#btn-terapkan').addClass('animate-pulse shadow-blue-500/50');
+                    }
+                }
+
+                $('#formReport select').on('change', function() {
+                    disableDownload();
+                });
+            });
         </script>
 
     </div>

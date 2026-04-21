@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Balita;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class BalitaController extends Controller
 {
@@ -38,24 +39,24 @@ class BalitaController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nik' => 'required|string|max:20',
             'nama' => 'required|string|max:255',
             'tanggal_lahir' => 'required|date',
             'jenis_kelamin' => 'required|in:L,P',
             'nama_orang_tua' => 'required|string|max:255',
+            'status_balita' => 'required|in:Masih Aktif,Tidak Aktif,Pindah'
         ]);
 
         $data = $request->all();
         
-        // Generate Auto Increment Kode (Format: BAL-0001)
-        $lastBalita = Balita::orderBy('id', 'desc')->first();
-        if ($lastBalita && $lastBalita->kode) {
-            $lastNumber = (int) substr($lastBalita->kode, 4);
+        // Generate Auto Increment Kode Balita (Format: BALita-0001)
+        $lastBalita = Balita::orderBy('kode_balita', 'desc')->first();
+        if ($lastBalita && $lastBalita->kode_balita) {
+            $lastNumber = (int) substr($lastBalita->kode_balita, 4);
             $newNumber = $lastNumber + 1;
         } else {
             $newNumber = 1;
         }
-        $data['kode'] = 'BAL-' . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
+        $data['kode_balita'] = 'BAL-' . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
 
         Balita::create($data);
 
@@ -70,11 +71,11 @@ class BalitaController extends Controller
     public function update(Request $request, Balita $balita)
     {
         $request->validate([
-            'nik' => 'required|string|max:20',
             'nama' => 'required|string|max:255',
             'tanggal_lahir' => 'required|date',
             'jenis_kelamin' => 'required|in:L,P',
             'nama_orang_tua' => 'required|string|max:255',
+            'status_balita' => 'required|in:Masih Aktif,Tidak Aktif,Pindah'
         ]);
 
         $balita->update($request->all());
@@ -103,13 +104,12 @@ class BalitaController extends Controller
 
             $exportData[] = [
                 'No' => $i + 1,
-                'Kode' => $balita->kode,
-                'NIK' => $balita->nik,
+                'Kode Balita' => $balita->kode_balita,
                 'Nama Balita' => $balita->nama,
                 'Usia' => $balita->usia,
                 'Jenis Kelamin' => $balita->jenis_kelamin,
                 'Nama Orang Tua' => $balita->nama_orang_tua,
-                'Status Usia' => $status,
+                'Status Balita' => $balita->status_balita,
                 'Tanggal Lahir' => $balita->tanggal_lahir,
             ];
         }
@@ -130,8 +130,7 @@ class BalitaController extends Controller
         $errors = [];
 
         foreach ($rows as $index => $row) {
-            $kode = $row['Kode'] ?? null;
-            $nik = $row['NIK'] ?? null;
+            $kode = $row['Kode Balita'] ?? null;
             $nama = $row['Nama Balita'] ?? null;
             $nama_ortu = $row['Nama Orang Tua'] ?? null;
             $jk = $row['Jenis Kelamin'] ?? null;
@@ -144,10 +143,7 @@ class BalitaController extends Controller
 
             $existing = null;
             if ($kode && $kode !== '-') {
-                $existing = Balita::where('kode', $kode)->first();
-            }
-            if (!$existing && $nik && $nik !== '-') {
-                $existing = Balita::where('nik', $nik)->first();
+                $existing = Balita::where('kode_balita', $kode)->first();
             }
             if (!$existing) {
                 $existing = Balita::where('nama', $nama)
@@ -181,33 +177,31 @@ class BalitaController extends Controller
         \DB::beginTransaction();
         try {
             foreach ($rows as $row) {
-                $kode = $row['Kode'] ?? null;
-                $nik = $row['NIK'] ?? '-';
+                $kode = $row['Kode Balita'] ?? null;
                 $nama = $row['Nama Balita'] ?? null;
-                $usia = $row['Usia'] ?? 0;
+                $usia = $row['Usia'] ?? null;
                 $jk = $row['Jenis Kelamin'] ?? null;
                 $nama_ortu = $row['Nama Orang Tua'] ?? null;
                 $tgl_lahir = $row['Tanggal Lahir'] ?? null;
+                $status_balita = $row['Status Balita'] ?? 'Masih Aktif';
 
                 if (!$nama || !$nama_ortu || !$jk) continue;
 
                 if (!$tgl_lahir) {
-                    $tgl_lahir = \Carbon\Carbon::now()->subYears((float)$usia)->format('Y-m-d');
+                    $tgl_lahir = \Carbon\Carbon::now()->subYears((float)($usia ?? 0))->format('Y-m-d');
                 } else {
                     try {
                         $tgl_lahir = \Carbon\Carbon::parse($tgl_lahir)->format('Y-m-d');
                     } catch (\Exception $e) {
-                        $tgl_lahir = \Carbon\Carbon::now()->subYears((float)$usia)->format('Y-m-d');
+                        $tgl_lahir = \Carbon\Carbon::now()->subYears((float)($usia ?? 0))->format('Y-m-d');
                     }
                 }
 
                 $existing = null;
                 if ($kode && $kode !== '-') {
-                    $existing = Balita::where('kode', $kode)->first();
+                    $existing = Balita::where('kode_balita', $kode)->first();
                 }
-                if (!$existing && $nik && $nik !== '-') {
-                    $existing = Balita::where('nik', $nik)->first();
-                }
+                
                 if (!$existing) {
                     $existing = Balita::where('nama', $nama)
                                       ->where('nama_orang_tua', $nama_ortu)
@@ -217,17 +211,17 @@ class BalitaController extends Controller
 
                 if ($existing) {
                     $existing->update([
-                        'nik' => $nik,
                         'nama' => $nama,
                         'usia' => $usia,
                         'jenis_kelamin' => $jk,
                         'nama_orang_tua' => $nama_ortu,
+                        'status_balita' => $status_balita,
                         'tanggal_lahir' => $tgl_lahir,
                     ]);
                 } else {
-                    $lastBalita = Balita::orderBy('id', 'desc')->first();
-                    if ($lastBalita && $lastBalita->kode) {
-                        $lastNumber = (int) substr($lastBalita->kode, 4);
+                    $lastBalita = Balita::orderBy('kode_balita', 'desc')->first();
+                    if ($lastBalita && $lastBalita->kode_balita) {
+                        $lastNumber = (int) substr($lastBalita->kode_balita, 4);
                         $newNumber = $lastNumber + 1;
                     } else {
                         $newNumber = 1;
@@ -235,12 +229,12 @@ class BalitaController extends Controller
                     $kode = 'BAL-' . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
 
                     Balita::create([
-                        'kode' => $kode,
-                        'nik' => $nik,
+                        'kode_balita' => $kode,
                         'nama' => $nama,
                         'usia' => $usia,
                         'jenis_kelamin' => $jk,
                         'nama_orang_tua' => $nama_ortu,
+                        'status_balita' => $status_balita,
                         'tanggal_lahir' => $tgl_lahir,
                     ]);
                 }

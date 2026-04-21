@@ -12,11 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('balitas', function (Blueprint $table) {
-            $table->id();
+            $table->string('kode_balita')->primary();
             $table->string('nama');
+            $table->decimal('usia', 5, 1)->nullable();
             $table->date('tanggal_lahir');
             $table->enum('jenis_kelamin', ['L', 'P']);
             $table->string('nama_orang_tua');
+            $table->enum('status_balita', ['Masih Aktif', 'Tidak Aktif', 'Pindah'])->default('Masih Aktif');
             $table->timestamps();
         });
     }

@@ -17,10 +17,7 @@
                     <div>
                         <div class="flex items-center gap-3 mb-2">
                             <span class="bg-white/20 text-white px-3 py-1 rounded-full text-xs font-bold tracking-widest backdrop-blur-sm">
-                                KODE: {{ $pemeriksaan->balita->kode ?? 'N/A' }}
-                            </span>
-                            <span class="bg-white/20 text-white px-3 py-1 rounded-full text-xs font-bold tracking-widest backdrop-blur-sm">
-                                NIK: {{ $pemeriksaan->balita->nik ?? '-' }}
+                                KODE: {{ $pemeriksaan->balita->kode_balita ?? '-' }}
                             </span>
                         </div>
                         <h2 class="text-3xl font-black text-white tracking-tight">{{ $pemeriksaan->balita->nama ?? 'Nama Balita' }}</h2>
@@ -51,11 +48,17 @@
                                     {{ number_format((float)$pemeriksaan->usia_saat_periksa, 1) }} <span class="text-sm font-bold text-slate-400">Tahun</span>
                                 </span>
                             </div>
-                            <div class="flex justify-between items-center">
+                            <div class="flex justify-between items-center pb-3 border-b border-slate-200 dark:border-slate-700/50">
                                 <span class="text-slate-500 dark:text-slate-400 font-medium font-bold">Metode Deteksi</span>
                                 <span class="text-indigo-600 dark:text-indigo-400 font-black flex items-center gap-1">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                                     AI KNN System
+                                </span>
+                            </div>
+                            <div class="flex justify-between items-center mt-2 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-100 dark:border-blue-800/30">
+                                <span class="text-slate-600 dark:text-slate-300 font-bold text-sm">Petugas TTD / Kader</span>
+                                <span class="text-blue-700 dark:text-blue-400 font-black bg-white dark:bg-blue-900 px-3 py-1 rounded-lg shadow-sm border border-blue-100 dark:border-blue-800">
+                                    {{ $pemeriksaan->kader->nama ?? 'Tidak Diketahui' }}
                                 </span>
                             </div>
                         </div>

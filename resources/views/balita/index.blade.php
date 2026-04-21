@@ -48,11 +48,11 @@
                     <tr class="text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wider bg-slate-50 dark:bg-slate-900/50">
                         <th class="px-6 py-4 font-bold rounded-l-xl text-center w-16">No.</th>
                         <th class="px-6 py-4 font-bold text-center">Kode</th>
-                        <th class="px-6 py-4 font-bold text-center">NIK</th>
                         <th class="px-6 py-4 font-bold">Nama Balita</th>
                         <th class="px-6 py-4 font-bold text-center">Usia (Tahun)</th>
                         <th class="px-6 py-4 font-bold text-center">L/P</th>
                         <th class="px-6 py-4 font-bold">Orang Tua</th>
+                        <th class="px-6 py-4 font-bold text-center">Status</th>
                         <th class="px-6 py-4 font-bold text-center rounded-r-xl">Aksi</th>
                     </tr>
                 </thead>
@@ -62,8 +62,7 @@
                         <td class="px-6 py-5 text-center font-bold text-slate-400 dark:text-slate-600">
                             {{ ($balitas->currentPage() - 1) * $balitas->perPage() + $loop->iteration }}
                         </td>
-                        <td class="px-6 py-5 text-center text-slate-700 dark:text-slate-400 font-medium">{{ $blt->kode }}</td>
-                        <td class="px-6 py-5 text-center text-slate-700 dark:text-slate-400 font-medium">{{ $blt->nik }}</td>
+                        <td class="px-6 py-5 text-center text-slate-700 dark:text-slate-400 font-medium">{{ $blt->kode_balita }}</td>
                         <td class="px-6 py-5">
                             <p class="font-bold text-slate-800 dark:text-slate-200">{{ $blt->nama }}</p>
                         </td>
@@ -76,6 +75,15 @@
                             @endif
                         </td>
                         <td class="px-6 py-5 text-slate-700 dark:text-slate-400 font-medium">{{ $blt->nama_orang_tua }}</td>
+                        <td class="px-6 py-5 text-center">
+                            @if($blt->status_balita == 'Masih Aktif')
+                                <span class="bg-green-50 text-green-600 px-2 py-1 rounded-md text-xs font-bold border border-green-200">Aktif</span>
+                            @elseif($blt->status_balita == 'Tidak Aktif')
+                                <span class="bg-red-50 text-red-600 px-2 py-1 rounded-md text-xs font-bold border border-red-200">Tidak Aktif</span>
+                            @else
+                                <span class="bg-orange-50 text-orange-600 px-2 py-1 rounded-md text-xs font-bold border border-orange-200">Pindah</span>
+                            @endif
+                        </td>
                         <td class="px-6 py-5 text-center">
                             <div class="flex items-center justify-center gap-2">
                                 <a href="{{ route('balita.edit', $blt) }}" class="text-amber-500 hover:text-amber-600 bg-amber-50 dark:bg-amber-900/20 p-2 rounded-lg transition" title="Edit">
@@ -155,15 +163,19 @@
                 <form action="{{ route('balita.store') }}" method="POST" class="px-6 py-6 space-y-5">
                     @csrf
                     <div>
-                        <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">NIK</label>
-                        <input type="text" name="nik" required class="w-full rounded-xl sm:text-sm border-slate-300 dark:border-slate-700 shadow-sm focus:ring-blue-500 focus:border-blue-500 p-3 bg-slate-50 dark:bg-slate-900 dark:text-white transition-colors">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Nama Lengkap Balita</label>
+                        <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Nama Lengkap Balita <span class="text-red-500">*</span></label>
                         <input type="text" name="nama" required class="w-full rounded-xl sm:text-sm border-slate-300 dark:border-slate-700 shadow-sm focus:ring-blue-500 focus:border-blue-500 p-3 bg-slate-50 dark:bg-slate-900 dark:text-white transition-colors">
                     </div>
  
                     <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Status Balita <span class="text-red-500">*</span></label>
+                            <select name="status_balita" required class="w-full rounded-xl sm:text-sm border-slate-300 dark:border-slate-700 shadow-sm focus:ring-blue-500 focus:border-blue-500 p-3 bg-slate-50 dark:bg-slate-900 dark:text-white transition-colors">
+                                <option value="Masih Aktif">Masih Aktif</option>
+                                <option value="Tidak Aktif">Tidak Aktif</option>
+                                <option value="Pindah">Pindah</option>
+                            </select>
+                        </div>
                         <div>
                             <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Tanggal Lahir</label>
                             <input type="date" name="tanggal_lahir" required class="w-full rounded-xl sm:text-sm border-slate-300 dark:border-slate-700 shadow-sm focus:ring-blue-500 focus:border-blue-500 p-3 bg-slate-50 dark:bg-slate-900 dark:text-white transition-colors">

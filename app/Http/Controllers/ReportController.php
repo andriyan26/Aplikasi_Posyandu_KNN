@@ -14,12 +14,12 @@ class ReportController extends Controller
     {
         $bulan = str_pad($request->get('bulan', date('m')), 2, '0', STR_PAD_LEFT);
         $tahun = $request->get('tahun', date('Y'));
-        $balita_id = $request->get('balita_id', '');
+        $kode_balita = $request->get('kode_balita', '');
         $bulan_akhir = str_pad($request->get('bulan_akhir', $bulan), 2, '0', STR_PAD_LEFT);
 
-        if ($balita_id) {
+        if ($kode_balita) {
             $pemeriksaans = Pemeriksaan::with('balita')
-                ->where('balita_id', $balita_id)
+                ->where('kode_balita', $kode_balita)
                 ->whereYear('tanggal_pemeriksaan', $tahun)
                 ->whereMonth('tanggal_pemeriksaan', '>=', $bulan)
                 ->whereMonth('tanggal_pemeriksaan', '<=', $bulan_akhir)
@@ -37,22 +37,22 @@ class ReportController extends Controller
 
         $semua_balita = Balita::orderBy('nama')->get();
 
-        return view('report.index', compact('balitas', 'pemeriksaans', 'bulan', 'tahun', 'balita_id', 'bulan_akhir', 'semua_balita'));
+        return view('report.index', compact('balitas', 'pemeriksaans', 'bulan', 'tahun', 'kode_balita', 'bulan_akhir', 'semua_balita'));
     }
 
     public function downloadPdf(Request $request)
     {
         $bulan = str_pad($request->get('bulan', date('m')), 2, '0', STR_PAD_LEFT);
         $tahun = $request->get('tahun', date('Y'));
-        $balita_id = $request->get('balita_id', '');
+        $kode_balita = $request->get('kode_balita', '');
         $bulan_akhir = str_pad($request->get('bulan_akhir', $bulan), 2, '0', STR_PAD_LEFT);
 
         $namaBulan = Carbon::createFromFormat('m', $bulan)->translatedFormat('F');
         $namaBulanAkhir = Carbon::createFromFormat('m', $bulan_akhir)->translatedFormat('F');
 
-        if ($balita_id) {
-            $pemeriksaans = Pemeriksaan::with('balita')
-                ->where('balita_id', $balita_id)
+        if ($kode_balita) {
+            $pemeriksaans = Pemeriksaan::with('balita', 'kader')
+                ->where('kode_balita', $kode_balita)
                 ->whereYear('tanggal_pemeriksaan', $tahun)
                 ->whereMonth('tanggal_pemeriksaan', '>=', $bulan)
                 ->whereMonth('tanggal_pemeriksaan', '<=', $bulan_akhir)
@@ -60,7 +60,7 @@ class ReportController extends Controller
                 ->get();
             $balitas = collect();
             
-            $balita = Balita::find($balita_id);
+            $balita = Balita::where('kode_balita', $kode_balita)->first();
             $safeName = $balita ? preg_replace('/[^a-zA-Z0-9_\-]/', '_', $balita->nama) : 'Anak';
             $filename = "Laporan_Perkembangan_{$safeName}_{$tahun}.pdf";
         } else {
@@ -74,7 +74,7 @@ class ReportController extends Controller
             $filename = "Laporan_Bulanan_Posyandu_{$namaBulan}_{$tahun}.pdf";
         }
 
-        $pdf = Pdf::loadView('report.pdf', compact('balitas', 'pemeriksaans', 'bulan', 'tahun', 'namaBulan', 'balita_id', 'bulan_akhir', 'namaBulanAkhir'))->setPaper('a4', 'portrait');
+        $pdf = Pdf::loadView('report.pdf', compact('balitas', 'pemeriksaans', 'bulan', 'tahun', 'namaBulan', 'kode_balita', 'bulan_akhir', 'namaBulanAkhir'))->setPaper('a4', 'portrait');
         
         return $pdf->download($filename);
     }

@@ -31,19 +31,6 @@
                 @csrf
                 @method('PUT')
 
-                <!-- NIK -->
-                <div>
-                    <label for="nik" class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Nomor Induk Kependudukan (NIK)</label>
-                    <input 
-                        type="text" 
-                        name="nik" 
-                        id="nik"
-                        value="{{ old('nik', $balita->nik) }}"
-                        required
-                        class="w-full rounded-xl text-sm border-slate-300 dark:border-slate-700 shadow-sm focus:ring-amber-500 focus:border-amber-500 p-3.5 bg-slate-50 dark:bg-slate-900 dark:text-white transition"
-                        placeholder="Masukkan NIK balita..."
-                    >
-                </div>
 
                 <!-- Nama Balita -->
                 <div>
@@ -105,6 +92,16 @@
                         class="w-full rounded-xl text-sm border-slate-300 dark:border-slate-700 shadow-sm focus:ring-amber-500 focus:border-amber-500 p-3.5 bg-slate-50 dark:bg-slate-900 dark:text-white transition"
                         placeholder="Masukkan nama orang tua atau wali..."
                     >
+                </div>
+
+                <!-- Status Balita -->
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Status Balita</label>
+                    <select name="status_balita" required class="w-full rounded-xl text-sm border-slate-300 dark:border-slate-700 shadow-sm focus:ring-amber-500 focus:border-amber-500 p-3.5 bg-slate-50 dark:bg-slate-900 dark:text-white transition">
+                        <option value="Masih Aktif" {{ old('status_balita', $balita->status_balita) == 'Masih Aktif' ? 'selected' : '' }}>Masih Aktif</option>
+                        <option value="Tidak Aktif" {{ old('status_balita', $balita->status_balita) == 'Tidak Aktif' ? 'selected' : '' }}>Tidak Aktif</option>
+                        <option value="Pindah" {{ old('status_balita', $balita->status_balita) == 'Pindah' ? 'selected' : '' }}>Pindah</option>
+                    </select>
                 </div>
 
                 <!-- Action Buttons -->
