@@ -63,6 +63,9 @@ class KnnController extends Controller
 
     public function import(Request $request)
     {
+        if (auth()->user()->role !== 'admin') {
+            abort(403, 'Unauthorized action.');
+        }
         $request->validate([
             'file_csv' => 'required|mimes:csv,txt'
         ]);
@@ -112,6 +115,9 @@ class KnnController extends Controller
 
     public function destroyAll()
     {
+        if (auth()->user()->role !== 'admin') {
+            abort(403, 'Unauthorized action.');
+        }
         DataLatih::truncate();
         return redirect()->back()->with('success', "Semua data latih telah dihapus.");
     }
@@ -121,6 +127,9 @@ class KnnController extends Controller
      */
     public function downloadTemplate()
     {
+        if (auth()->user()->role !== 'admin') {
+            abort(403, 'Unauthorized action.');
+        }
         $headers = [
             "Content-type"        => "text/csv",
             "Content-Disposition" => "attachment; filename=template_knn_posyandu.csv",

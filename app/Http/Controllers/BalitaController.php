@@ -33,11 +33,17 @@ class BalitaController extends Controller
 
     public function create()
     {
+        if (auth()->user()->role !== 'admin') {
+            abort(403, 'Unauthorized action.');
+        }
         return view('balita.create');
     }
 
     public function store(Request $request)
     {
+        if (auth()->user()->role !== 'admin') {
+            abort(403, 'Unauthorized action.');
+        }
         $request->validate([
             'nama' => 'required|string|max:255',
             'tanggal_lahir' => 'required|date',
@@ -65,11 +71,17 @@ class BalitaController extends Controller
 
     public function edit(Balita $balita)
     {
+        if (auth()->user()->role !== 'admin') {
+            abort(403, 'Unauthorized action.');
+        }
         return view('balita.edit', compact('balita'));
     }
 
     public function update(Request $request, Balita $balita)
     {
+        if (auth()->user()->role !== 'admin') {
+            abort(403, 'Unauthorized action.');
+        }
         $request->validate([
             'nama' => 'required|string|max:255',
             'tanggal_lahir' => 'required|date',
@@ -85,6 +97,9 @@ class BalitaController extends Controller
 
     public function destroy(Balita $balita)
     {
+        if (auth()->user()->role !== 'admin') {
+            abort(403, 'Unauthorized action.');
+        }
         $balita->delete();
         return redirect()->route('balita.index')->with('success', 'Data Balita berhasil dihapus');
     }
@@ -119,6 +134,9 @@ class BalitaController extends Controller
 
     public function importPreview(Request $request)
     {
+        if (auth()->user()->role !== 'admin') {
+            return response()->json(['error' => 'Unauthorized action.'], 403);
+        }
         $rows = $request->input('data');
         if (!$rows || !is_array($rows)) {
             return response()->json(['error' => 'Data tidak valid'], 400);
@@ -169,6 +187,9 @@ class BalitaController extends Controller
 
     public function importProcess(Request $request)
     {
+        if (auth()->user()->role !== 'admin') {
+            return response()->json(['error' => 'Unauthorized action.'], 403);
+        }
         $rows = $request->input('data');
         if (!$rows || !is_array($rows)) {
             return response()->json(['error' => 'Data tidak valid'], 400);

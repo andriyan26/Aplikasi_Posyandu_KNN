@@ -31,6 +31,7 @@
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                     Export Excel
                 </button>
+                @if(auth()->user()->role === 'admin')
                 <button type="button" onclick="document.getElementById('modal-import').classList.remove('hidden')" class="bg-white dark:bg-slate-800 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 text-sm font-bold py-1.5 px-5 rounded-full shadow-sm hover:shadow transition-all flex items-center gap-2 shrink-0 border border-blue-500">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
                     Import Excel
@@ -39,6 +40,7 @@
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
                     Tambah Data
                 </button>
+                @endif
             </div>
         </div>
 
@@ -53,7 +55,9 @@
                         <th class="px-6 py-4 font-bold text-center">L/P</th>
                         <th class="px-6 py-4 font-bold">Orang Tua</th>
                         <th class="px-6 py-4 font-bold text-center">Status</th>
+                        @if(auth()->user()->role === 'admin')
                         <th class="px-6 py-4 font-bold text-center rounded-r-xl">Aksi</th>
+                        @endif
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 dark:divide-slate-700/50">
@@ -84,6 +88,7 @@
                                 <span class="bg-orange-50 text-orange-600 px-2 py-1 rounded-md text-xs font-bold border border-orange-200">Pindah</span>
                             @endif
                         </td>
+                        @if(auth()->user()->role === 'admin')
                         <td class="px-6 py-5 text-center">
                             <div class="flex items-center justify-center gap-2">
                                 <a href="{{ route('balita.edit', $blt) }}" class="text-amber-500 hover:text-amber-600 bg-amber-50 dark:bg-amber-900/20 p-2 rounded-lg transition" title="Edit">
@@ -98,10 +103,11 @@
                                 </form>
                             </div>
                         </td>
+                        @endif
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="px-6 py-12 text-center text-slate-500 dark:text-slate-400 font-medium bg-slate-50/50 dark:bg-slate-800/30 rounded-2xl">
+                        <td colspan="{{ auth()->user()->role === 'admin' ? 8 : 7 }}" class="px-6 py-12 text-center text-slate-500 dark:text-slate-400 font-medium bg-slate-50/50 dark:bg-slate-800/30 rounded-2xl">
                             @if(request('search'))
                                 Balita "{{ request('search') }}" tidak ditemukan.
                             @else

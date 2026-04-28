@@ -6,6 +6,7 @@
     <div class="w-full max-w-7xl mx-auto pb-12 px-4 sm:px-6">
 
         <!-- Action Row (K-Value & Upload CSV) - RE-CONSTRAINED -->
+        @if(auth()->user()->role === 'admin')
         <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch mb-10">
 
             <!-- Left: Download Template -->
@@ -76,6 +77,7 @@
                 </form>
             </div>
         </div>
+        @endif
 
         @if($evaluasi && $totalData > 0)
             <!-- Dashboard Metrics -->
@@ -257,7 +259,7 @@
                         </p>
                     </div>
                 </div>
-                @if($totalData > 0)
+                @if($totalData > 0 && auth()->user()->role === 'admin')
                     <form action="{{ route('knn.destroy_all') }}" method="POST"
                         onsubmit="event.preventDefault(); Swal.fire({title: 'Reset Data Latih?', text: 'Seluruh data set pelatihan akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', cancelButtonColor: '#64748b', confirmButtonText: 'Ya, Reset Data!', cancelButtonText: 'Batal', customClass: { popup: 'rounded-3xl' }}).then((result) => { if (result.isConfirmed) { this.submit(); } });">
                         @csrf @method('DELETE')
